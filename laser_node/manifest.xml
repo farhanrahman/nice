@@ -1,0 +1,16 @@
+<package>
+  <description brief="laser_node">
+
+     laser_node
+
+  </description>
+  <author>Farhan</author>
+  <license>BSD</license>
+  <review status="unreviewed" notes=""/>
+  <url>http://ros.org/wiki/laser_node</url>
+  <depend package="hokuyo_node"/>
+  <depend package="sicktoolbox_wrapper"/>
+
+</package>
+
+

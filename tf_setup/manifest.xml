@@ -1,0 +1,16 @@
+<package>
+  <description brief="tf_setup">
+
+     tf_setup
+
+  </description>
+  <author>Farhan</author>
+  <license>BSD</license>
+  <review status="unreviewed" notes=""/>
+  <url>http://ros.org/wiki/tf_setup</url>
+  <depend package="roscpp"/>
+  <depend package="tf"/>
+
+</package>
+
+
