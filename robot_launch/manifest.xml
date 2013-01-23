@@ -1,0 +1,14 @@
+<package>
+  <description brief="robot_launch">
+
+     robot_launch
+
+  </description>
+  <author>Farhan</author>
+  <license>BSD</license>
+  <review status="unreviewed" notes=""/>
+  <url>http://ros.org/wiki/robot_launch</url>
+
+</package>
+
+

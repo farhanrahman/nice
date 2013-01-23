@@ -2,9 +2,10 @@
 #define TRANSFORM_MANAGER_H
 
 #include <vector>
-#include <tf_setup/include/tf_setup/WorldObject.h>
-#include <tf/tf_broadcaster.h>
-
+#include <tf_setup/WorldObject.h>
+#include <tf/transform_broadcaster.h>
+#include <string>
+#include <sstream>
 
 namespace tf_setup{
 class TransformManager{
@@ -15,7 +16,7 @@ public:
 		this->objects.push_back(obj);
 	}
 
-	TransformManager(std::vector<tf_setup::WorldObjec> objects) : objects(objects) {};
+	TransformManager(std::vector<tf_setup::WorldObject> objects) : objects(objects) {};
 
 	~TransformManager(){};
 
@@ -27,10 +28,13 @@ public:
 		std::vector<tf_setup::WorldObject>::iterator it;
 		ros::Time t = ros::Time::now();
 		for(it = objects.begin(); it != objects.end(); ++it){
-			broadCaster.sendTransform(tf::StampedTransform((*it).getPose()), 
+			std::cout << (*it) << std::endl;
+			broadCaster.sendTransform(tf::StampedTransform(
+							(*it).getPose(), 
 							t, 
 							(*it).getParentFrame(), 
 							(*it).getFrame()
+							)
 						);
 		}
 	}

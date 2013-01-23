@@ -1,0 +1,22 @@
+<launch>
+        <!-- Launch p2os --> 
+        <node pkg="p2os_driver" name="p2os" type="p2os">
+                <param name="port" value="/dev/ttyUSB0"/>
+        </node>
+    
+	<node pkg="pr2_teleop" type="teleop_pr2_keyboard" name="spawn_teleop_keyboard" output="screen">
+      		<param name="walk_vel" value="0.5" />
+      		<param name="run_vel" value="1.0" />
+      		<param name="yaw_rate" value="1.0" />
+      		<param name="yaw_run_rate" value="1.5" />
+    	</node>
+
+	<include file="$(find p2os_launch)/teleop_joy.launch" />
+	<param name="/spawn_teleop_keyboard/walk_vel" value="0.25" />
+    	<param name="/spawn_teleop_keyboard/run_vel" value="0.5" />
+    	<param name="/spawn_teleop_keyboard/yaw_rate" value="0.5" />
+    	<param name="/spawn_teleop_keyboard/yaw_run_rate" value="0.75" />
+	
+
+	<node pkg="rviz" type="rviz" name="rviz" args="-d $(find robot_launch)/rviz/navigation.vcg"/>
+</launch>

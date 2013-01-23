@@ -1,0 +1,35 @@
+<launch>
+	<master auto="start" />
+
+	<!-- Launch transform configuration -->
+	<include file="$(find tf_setup)/launch/tf_setup.launch"/>
+
+	<!-- Launch hokuyo nodes -->
+	<include file="$(find laser_node)/launch/laser_hokuyo.launch"/>
+
+
+	<!-- Launch p2os -->
+	<node pkg="p2os_driver" name="p2os" type="p2os">
+		<param name="port" value="/dev/ttyUSB0"/>
+	</node>
+
+	<!-- Include launching for gmapping -->
+  	<include file="$(find robot_launch)/launch/gmapping.launch"/>
+ 
+<!--	<include file="$(find navigation_stage)/move_base_config/move_base.xml"/>
+        <include file="$(find navigation_stage)/move_base_config/slam_gmapping.xml"/> 
+-->
+	<!--Run AMCL-->
+	<include file="$(find robot_launch)/launch/amcl_diff.launch" />
+
+	<node pkg="move_base" type="move_base" respawn="false" name="move_base" output="screen">
+		<rosparam file="$(find robot_launch)/configs/costmap_common_params.yaml" command="load" ns="global_costmap" />
+		<rosparam file="$(find robot_launch)/configs/costmap_common_params.yaml" command="load" ns="local_costmap" />
+		<rosparam file="$(find robot_launch)/configs/local_costmap_params.yaml" command="load" />
+		<rosparam file="$(find robot_launch)/configs/global_costmap_params.yaml" command="load" />
+		<rosparam file="$(find robot_launch)/configs/base_local_planner_params.yaml" command="load" />
+	</node>
+
+	<node pkg="rviz" type="rviz" name="rviz" args="-d $(find robot_launch)/rviz/navigation.vcg"/>
+
+</launch>

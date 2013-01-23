@@ -1,0 +1,9 @@
+rate: 10
+
+world_objects: ["base_laser_link"] #["base_laser_link", "base_link", "base_footprint"]
+
+base_footprint: { x: 0.0, y: 0.0, z: 0.0, rx: 0.0, ry: 0.0, rz: 0.0, rw: 1.0, parent_frame_id: "odom", frame_id: "base_footprint"}
+
+base_link: { x: 0.0, y: 0.0, z: 0.1, rx: 0.0, ry: 0.0, rz: 0.0, rw: 1.0, parent_frame_id: "base_footprint", frame_id: "base_link"}
+
+base_laser_link: { x: 0.2, y: 0.0, z: 0.1, rx: 0.0, ry: 0.0, rz: 0.0, rw: 1.0, parent_frame_id: "base_link", frame_id: "base_laser_link"}

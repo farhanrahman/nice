@@ -1,0 +1,114 @@
+# Simple_map.world
+# This specifies the world that Stage will simulate. 
+
+# =================================================================
+# Set up options
+# =================================================================
+
+# set the resolution of the underlying raytrace model in meters
+resolution 0.02
+# simulation timestep in milliseconds
+interval_sim 20 
+
+
+# =================================================================
+# Define the models we will be using. 
+# =================================================================
+
+# defines our laser called topurg and is of type ranger
+define topurg ranger
+(
+    sensor(
+        #specify the range of the laser
+        range [ 0.0  5.0 ]
+        #specify the field of view (fov)
+        fov 270.25
+        #how many samples in the fov
+        samples 1081
+    )
+
+    # generic model properties
+    # color of our laser
+    color "black"
+
+    # size of the laser
+    size [ 0.050 0.050 0.100 ]
+)
+
+# defines our erratic mobile robot (of type position)
+define erratic position
+(
+    # differential drive robot
+    drive "diff"
+    
+    # size of the robot.
+    size [0.350 0.350 0.250]
+    
+    # where is midpoint of the robot? [x,y,z,heading]
+    origin [-0.050 0.000 0.000 0.000]
+    
+    # draw a "nose" on the model showing the heading
+    gui_nose 1
+
+    # with a laser
+    topurg(pose [ 0.050 0.000 0.000 0.000 ])
+)
+
+# defines our floorplan
+define floorplan model
+(
+    # sombre, sensible, artistic
+    color "black"
+
+    # most maps will need a bounding box
+    boundary 1
+    
+    # we want laser hits to register
+    ranger_return 1
+
+    # no gui nose or grid
+    gui_nose 0
+    gui_grid 0
+    gui_outline 0
+    gripper_return 0
+    fiducial_return 0
+    
+)
+
+# =================================================================
+# Create the models 
+# =================================================================
+
+# Create the map
+floorplan
+( 
+    #specify the map we are using, size and pose
+    name "simplemap"
+    bitmap "map_level10_ros.pgm"
+    
+    #size in meters
+    #size [4.200 5.300 0.500]
+    size [20 15 0.5]
+    # pose of the map
+    pose [ -0.062 -0.044 0.000 90.000 ]
+)
+
+# Create up the robot
+erratic( 
+    name "my_robot" 
+    color "red"
+    
+    #pose of the robot [x,y,z,heading]
+    pose [ 1.537 0.283 0.000 -52.372 ] 
+)
+
+# the Stage GUI window properties
+window
+( 
+    size [ 585 539 ] 
+    rotate [ 1.000 89.940 ]
+    scale 51.032 
+)
+
+
+

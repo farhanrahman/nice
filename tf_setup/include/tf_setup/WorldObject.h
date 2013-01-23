@@ -1,23 +1,33 @@
 #ifndef WORLD_OBJECT_H
 #define WORLD_OBJECT_H
 
-#include <tf/Transform.h>
+#include <tf/LinearMath/Transform.h>
+#include <iostream>
+#include <sstream>
 #include <string>
 
 namespace tf_setup{
 
 class WorldObject{
 public:
+	static WorldObject withFrames(std::string parentFrame, std::string frame) {
+		return WorldObject(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, parentFrame, frame);
+	}
+
 	/*Default constructor*/
 	WorldObject(float x = 0.0, float y = 0.0, float z = 0.0,
-			float rx = 0.0, float ry = 0.0, float rz = 0.0, float theta = 0.0,
+			float rx = 0.0, float ry = 0.0, float rz = 0.0, float rw = 0.0,
 			std::string parentFrame = "world", std::string frame = "base_link") :
-		x(x), y(y), z(z), rx(rx), ry(ry), rz(rz), theta(theta), parentFrame, frame {};
+		x(x), y(y), z(z), rx(rx), ry(ry), rz(rz), rw(rw), parentFrame(parentFrame), frame(frame) {
+		if(this->rw == 0.0){
+			this->rw = 1.0;
+		}
+	};
 
 	~WorldObject(){};
 
 	tf::Quaternion getRotation(void){
-		return tf::Quaternion(this->rx, this->ry, this->rz, this->theta);
+		return tf::Quaternion(this->rx, this->ry, this->rz, this->rw);
 	}
 
 	tf::Vector3 getPosition(void){
@@ -25,40 +35,44 @@ public:
 	}
 
 	tf::Transform getPose(void){
-		return tf::Transform(this->getRotation(), this->getPosition);
+		return tf::Transform(this->getRotation(), this->getPosition());
 	}
 
 	/*Getter functions*/
 
-	float getX(void){
+	float getX(void) const{
 		return this->x;
 	}
 
-	float getY(void){
+	float getY(void) const{
 		return this->y;
 	}
 
-	float getZ(void){
+	float getZ(void) const{
 		return this->z;
 	}
 	
-	float getRX(void){
+	float getRX(void) const{
 		return this->rx;
 	}
 
-	float getRY(void){
+	float getRY(void) const{
 		return this->ry;
 	}
 
-	float getRZ(void){
+	float getRZ(void) const{
 		return this->rz;
 	}
 
-	std::string getFrame(void){
+	float getRW(void) const{
+		return this->rw;
+	}
+
+	std::string getFrame(void) const{
 		return this->frame;
 	}
 
-	std::string getParentFrame(void){
+	std::string getParentFrame(void) const{
 		return this->parentFrame;
 	}
 
@@ -88,8 +102,8 @@ public:
 		this->rz = rz;
 	}
 
-	void setTheta(float theta){
-		this->theta = theta;
+	void setRW(float rw){
+		this->rw = rw;
 	}
 
 private:
@@ -103,10 +117,25 @@ private:
 	float rx;
 	float ry;
 	float rz;
-	float theta;
+	float rw;
 
 	std::string frame;
 	std::string parentFrame;
 };
 }
+
+std::ostream& operator<<(std::ostream& oss, const tf_setup::WorldObject& o){
+	oss << "position: [" << o.getX() << ", " << o.getY() << ", " << o.getZ()
+		<< "]" << " orientation: [" << o.getRX() << ", " << o.getRZ() << ", " 
+		<< o.getRY() << ", " << o.getRW() << "] " << std::endl;
+	return oss;
+}
+
+std::stringstream& operator<<(std::stringstream& ss, const tf_setup::WorldObject& o){
+	ss << "position: [" << o.getX() << ", " << o.getY() << ", " << o.getZ()
+		<< "]" << " orientation: [" << o.getRX() << ", " << o.getRZ() << ", " 
+		<< o.getRY() << ", " << o.getRW() << "] " << std::endl;
+	return ss;
+}
+
 #endif

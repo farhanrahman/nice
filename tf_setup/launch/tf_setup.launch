@@ -1,0 +1,5 @@
+<launch>
+	<node pkg="tf_setup" type="tf_setup" name="tf_setup">
+		<rosparam file="$(find tf_setup)/configs/config1.yaml" command="load"/>
+	</node>
+</launch>
