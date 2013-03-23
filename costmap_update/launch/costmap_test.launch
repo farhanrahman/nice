@@ -1,0 +1,10 @@
+<launch>
+	<!--Launch Openni Tracker that feeds tf data to /tf-->
+	<node name="openni_tracker" pkg="openni_tracker" type="openni_tracker" />
+
+	<!--Create a node for costmap_update for testing-->
+	<node name="costmap_update" pkg="costmap_update" type="costmap_update" />
+
+	<!--Launch rxconsole-->
+	<!--<node name="rxconsole" pkg="rxconsole" type="rxconsole" />-->
+</launch>

@@ -1,6 +1,9 @@
 <launch>
 	<master auto="start" />
 
+	<!-- Launch OpenNI tracker -->
+	<!--<node pkg="openni_tracker" name="openni_tracker" type="openni_tracker/> -->
+
 	<!-- Launch transform configuration -->
 	<include file="$(find tf_setup)/launch/tf_setup.launch"/>
 
