@@ -1,0 +1,3 @@
+<launch>
+	<node name="openni_tracker" pkg="openni_tracker" type="openni_tracker" />
+</launch>
