@@ -10,7 +10,10 @@
   <url>http://ros.org/wiki/costmap_update</url>
   <depend package="roscpp"/>
   <depend package="tf"/>
-
+  <depend package="costmap_2d"/>
+  <depend package="std_msgs"/>
+  <depend package="geometry_msgs"/>
+  <depend package="sensor_msgs"/>
 </package>
 
 

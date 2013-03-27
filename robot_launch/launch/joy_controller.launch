@@ -1,0 +1,9 @@
+<launch>
+	<!--Launch joystick controller-->
+	<include file="$(find ros_intro)/launch/joystick_controller.launch"/>
+
+	<!--Launch P20S-->
+	<node pkg="p2os_driver" name="p2os" type="p2os">
+		<param name="port" value="/dev/ttyUSB0"/>
+	</node>
+</launch>

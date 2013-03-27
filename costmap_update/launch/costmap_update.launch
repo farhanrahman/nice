@@ -1,0 +1,15 @@
+<launch>
+	<!--Launch Openni Tracker that feeds tf data to /tf-->
+	<node name="openni_tracker" pkg="openni_tracker" type="openni_tracker" />
+
+	<!--Launch tf setup for robot-->
+	<node pkg="tf_setup" type="tf_setup" name="tf_setup">
+		<rosparam file="$(find costmap_update)/launch/config.yaml" command="load"/>
+	</node>
+
+	<!--Create a node for costmap_update for testing-->
+	<node name="costmap_update" pkg="costmap_update" type="costmap_update" />
+
+	<!--Launch rviz-->
+	<node name="rviz" pkg="rviz" type="rviz"/>
+</launch>

@@ -7,8 +7,8 @@ int main(int argc, char *argv[])
 
 	ros::init(argc, argv, "costmap_update");
 	ros::NodeHandle nodeHandle;
-	Updater costMapUpdater(nodeHandle);
 
+	Updater costMapUpdater(nodeHandle);
 
 	ros::spin();
 
