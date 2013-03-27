@@ -2,6 +2,12 @@
 	<!--Launch Openni Tracker that feeds tf data to /tf-->
 	<node name="openni_tracker" pkg="openni_tracker" type="openni_tracker" />
 
+	<!--Launch tf setup for robot-->
+	<include file="$(find tf_setup)/launch/tf_setup.launch"/>
+
 	<!--Create a node for costmap_update for testing-->
 	<node name="costmap_update" pkg="costmap_update" type="costmap_update" />
+
+	<!--Launch rviz-->
+	<node name="rviz" pkg="rviz" type="rviz"/>
 </launch>

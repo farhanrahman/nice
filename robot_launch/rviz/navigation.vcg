@@ -1,7 +1,7 @@
 Background\ ColorB=0
 Background\ ColorG=0
 Background\ ColorR=0
-Camera\ Config=68.1152 -2.14852 16.1826 0.0134874
+Camera\ Config=187.151 0 0 0
 Camera\ Type=rviz::FixedOrientationOrthoViewController
 Current\ Goal.Alpha=1
 Current\ Goal.ColorB=0
@@ -14,7 +14,7 @@ Current\ Goal.Shaft\ Length=1
 Current\ Goal.Shaft\ Radius=0.1
 Current\ Goal.Shape=0
 Current\ Goal.Topic=/goal
-Fixed\ Frame=/map
+Fixed\ Frame=/base_link
 Global\ Plan.Alpha=1
 Global\ Plan.ColorB=0.00784314
 Global\ Plan.ColorG=0.0823529
@@ -66,9 +66,9 @@ Planner\ Plan.ColorG=0
 Planner\ Plan.ColorR=1
 Planner\ Plan.Enabled=1
 Planner\ Plan.Topic=/move_base/NavfnROS/plan
-Property\ Grid\ Splitter=245,78
-Property\ Grid\ State=expanded=.Global Options,Obstacles.Enabled,Inflated Obstacles.Enabled,Robot Footprint.Enabled,Global Plan.Enabled,Planner Plan.Enabled,Local Plan.Enabled,Current Goal.Enabled;splitterratio=0.5
-QMainWindow=000000ff00000000fd00000003000000000000011d00000195fc0200000001fb000000100044006900730070006c006100790073010000001d00000195000000ee00ffffff000000010000013100000195fc0200000003fb0000001e0054006f006f006c002000500072006f0070006500720074006900650073010000001d000000670000006700fffffffb0000000a00560069006500770073010000008a000000bb000000bb00fffffffb0000001200530065006c0065006300740069006f006e010000014b000000670000006700ffffff00000003000002bf0000003efc0100000001fb0000000800540069006d00650100000000000002bf000002bf00ffffff000000650000019500000004000000040000000800000008fc0000000100000002000000010000000a0054006f006f006c00730100000000ffffffff0000000000000000
+Property\ Grid\ Splitter=519,78
+Property\ Grid\ State=expanded=.Global Options,Obstacles.Enabled,Inflated Obstacles.Enabled,Robot Footprint.Enabled,Global Plan.Enabled,Planner Plan.Enabled,Local Plan.Enabled,Current Goal.Enabled,TF.Enabled;splitterratio=0.5
+QMainWindow=000000ff00000000fd00000003000000000000011d000002a7fc0200000001fb000000100044006900730070006c006100790073010000001d000002a7000000ee00ffffff0000000100000131000002a7fc0200000003fb0000001e0054006f006f006c002000500072006f0070006500720074006900650073010000001d000000ae0000006700fffffffb0000000a0056006900650077007301000000d10000013f000000bb00fffffffb0000001200530065006c0065006300740069006f006e0100000216000000ae0000006700ffffff00000003000004bf0000003efc0100000001fb0000000800540069006d00650100000000000004bf000002bf00ffffff00000265000002a700000004000000040000000800000008fc0000000100000002000000010000000a0054006f006f006c00730100000000ffffffff0000000000000000
 Robot\ Footprint.Alpha=1
 Robot\ Footprint.ColorB=0.984314
 Robot\ Footprint.ColorG=0.0627451
@@ -79,6 +79,14 @@ Static\ Map.Alpha=0.7
 Static\ Map.Draw\ Behind=0
 Static\ Map.Enabled=1
 Static\ Map.Topic=/map
+TF.All\ Enabled=1
+TF.Enabled=1
+TF.Frame\ Timeout=15
+TF.Marker\ Scale=1
+TF.Show\ Arrows=1
+TF.Show\ Axes=1
+TF.Show\ Names=1
+TF.Update\ Interval=0
 Target\ Frame=/map
 Tool\ 2D\ Nav\ GoalTopic=move_base_simple/goal
 Tool\ 2D\ Pose\ EstimateTopic=initialpose
@@ -88,6 +96,9 @@ Name=Grid
 [Display1]
 ClassName=rviz::MapDisplay
 Name=Static Map
+[Display10]
+ClassName=rviz::TFDisplay
+Name=TF
 [Display2]
 ClassName=rviz::PoseArrayDisplay
 Name=Particle Cloud
@@ -112,8 +123,29 @@ Name=Local Plan
 [Display9]
 ClassName=rviz::PoseDisplay
 Name=Current Goal
+[TF.Frames.]
+base_laser_link.Enabled=1
+base_link.Enabled=1
+head_1.Enabled=1
+left_elbow_1.Enabled=1
+left_foot_1.Enabled=1
+left_hand_1.Enabled=1
+left_hip_1.Enabled=1
+left_knee_1.Enabled=1
+left_shoulder_1.Enabled=1
+map.Enabled=1
+neck_1.Enabled=1
+odom.Enabled=1
+openni_depth_frame.Enabled=1
+right_elbow_1.Enabled=1
+right_foot_1.Enabled=1
+right_hand_1.Enabled=1
+right_hip_1.Enabled=1
+right_knee_1.Enabled=1
+right_shoulder_1.Enabled=1
+torso_1.Enabled=1
 [Window]
-Height=538
-Width=719
+Height=776
+Width=1215
 X=-7
 Y=0

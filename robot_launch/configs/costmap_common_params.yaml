@@ -1,4 +1,4 @@
-obstacle_range: 2.5
+obstacle_range: 4.0
 raytrace_range: 3.0
 
 #footprint: [[-0.325, -0.325], [-0.325, 0.325], [0.325, 0.325], [0.46, 0.0], [0.325, -0.325]]
@@ -8,11 +8,11 @@ footprint: [[0.305, 0.278], [0.04, 0.193], [-0.04, 0.193], [-0.282, 0.178], [-0.
 
 inflation_radius: 0.1
 
-observation_sources: laser_scan_sensor camera
+observation_sources: camera
 
 laser_scan_sensor: {sensor_frame: base_laser_link, data_type: LaserScan, topic: base_scan, marking: true, clearing: true}
 
-camera : {sensor_frame: camera_depth_frame, data_type: PointCloud, topic: point_cloud_topic, marking: true, clearing: false}
+camera : {sensor_frame: openni_depth_frame, data_type: PointCloud, topic: point_cloud_topic, marking: true, clearing: true}
 
 map_type: costmap
 transform_tolerance: 0.4 #seconds

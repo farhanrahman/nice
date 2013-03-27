@@ -9,6 +9,8 @@
 #include <tf/tfMessage.h>
 #include <sensor_msgs/PointCloud.h>
 #include <std_msgs/Float32.h>
+#include <math.h>
+#include <costmap_update/tfMessageParser.hpp>
 
 #define BUFFER_SIZE 10
 #define MAX_COST_VALUE 254
@@ -54,26 +56,15 @@ public:
 	
 		/*Store the points into the point cloud*/
 		for (unsigned i = 0; i < (*msg).transforms.size(); ++i){
-			geometry_msgs::Transform transform = (*msg).transforms.at(i).transform;
-			geometry_msgs::Point32 point;
-
-			/*For each point in the message. Copy the x, y and z
-			 *components accross to the x,y and z co-ordinates
-			 *of the points.*/
-			point.x = transform.translation.x;
-			point.y = transform.translation.y;
-			point.z = transform.translation.z;
-
-			/*Copy the depth value recorded from the sensor*/
-			std_msgs::Float32 d;
-			d.data = point.x;
-
-			/*Update the distance array of the channel*/
-			distance.values.push_back(d.data);
-
-			/*Update the points array*/
-			points.push_back(point);
-
+			try{
+				tfparser::message m = tfMessageParser::parseFrame((std::string) (*msg).transforms.at(i).child_frame_id);
+				if(m.part == "/torso"){
+					generateBlob(points, (*msg).transforms.at(i).transform, distance);
+					ROS_INFO("generating blob for torso");
+				}
+			} catch(const FrameFormatNotCorrect &e){
+				ROS_WARN(e.what());
+			}
 		}
 
 		/*Update the channel with the distance data*/
@@ -91,6 +82,44 @@ public:
 	}
 
 private:
+
+	void generateBlob(
+			std::vector<geometry_msgs::Point32> &points, 
+			const geometry_msgs::Transform& transform,
+			sensor_msgs::ChannelFloat32& distance,
+			unsigned density = 1000 /*By Default there should be 1000 points in the point cloud*/
+	){
+			const float distanceFromCentre = 0.05; //80 cm
+			/*Generate random seed*/
+			srand((unsigned)time(0));
+
+			for(unsigned i = 0; i < density; ++i){
+				geometry_msgs::Point32 point;
+				float r = (float)rand()/(float)RAND_MAX;
+				/*For each point in the message. Copy the x, y and z
+				 *components accross to the x,y and z co-ordinates
+				 *of the points.*/
+
+				int decision = rand() % 2;
+
+				point.x = decision == 0 ? transform.translation.x + r*distanceFromCentre : transform.translation.x - r*distanceFromCentre;
+				r = (float)rand()/(float)RAND_MAX;
+				point.y = decision == 0 ? transform.translation.y + r*distanceFromCentre : transform.translation.y - r*distanceFromCentre;
+				r = (float)rand()/(float)RAND_MAX;
+				point.z = decision == 0 ? transform.translation.z + r*distanceFromCentre : transform.translation.z - r*distanceFromCentre;
+
+				/*Copy the depth value recorded from the sensor*/
+				std_msgs::Float32 d;
+				d.data = point.x;
+
+				/*Update the distance array of the channel*/
+				distance.values.push_back(d.data);
+
+				/*Update the points array*/
+				points.push_back(point);
+			}
+	}
+
 	int trackLimit;
 	ros::Publisher publisher;
 	ros::Subscriber sub;
