@@ -1,28 +1,20 @@
 <launch>
 	<master auto="start" />
+	<node pkg="stage" name="stageros" type="stageros" args="$(find robot_launch)/world/simple_map.world"/>
 
-	<!-- Launch transform configuration -->
-	<include file="$(find tf_setup)/launch/tf_setup.launch"/>
+  	<param name="/use_sim_time" value="true"/>
+<!--   	<include file="$(find navigation_stage)/move_base_config/move_base.xml"/>
+  	<include file="$(find navigation_stage)/move_base_config/slam_gmapping.xml"/>   -->
 
-	<!--Luanch costmap updater-->
-	<include file="$(find costmap_update)/launch/costmap_update.launch"/>
-
-	<!-- Launch hokuyo nodes -->
-	<include file="$(find laser_node)/launch/laser_hokuyo.launch"/>
-
-	<!-- Launch p2os -->
-	<node pkg="p2os_driver" name="p2os" type="p2os">
-		<param name="port" value="/dev/ttyUSB0"/>
-	</node>
-
-	<!-- Include launching for gmapping -->
-  	<include file="$(find robot_launch)/launch/gmapping.launch"/>
- 
 	<!--Run AMCL-->
-	<include file="$(find robot_launch)/launch/amcl_diff.launch" />
+	<include file="$(find robot_launch)/launch/amcl/amcl_diff.launch" />
+
+	<!-- Run gmapping -->
+	<include file="$(find robot_launch)/launch/gmapping/gmapping.launch"/>
 
 	<!--Run Move base-->
 	<node pkg="move_base" type="move_base" respawn="false" name="move_base" output="screen">
+		<!-- <param name="base_local_planner" value="vfh_local_planner/VFHLocalPlannerROS" /> -->
 		<rosparam file="$(find robot_launch)/configs/costmap_common_params.yaml" command="load" ns="global_costmap" />
 		<rosparam file="$(find robot_launch)/configs/costmap_common_params.yaml" command="load" ns="local_costmap" />
 		<rosparam file="$(find robot_launch)/configs/local_costmap_params.yaml" command="load" />
@@ -30,7 +22,10 @@
 		<rosparam file="$(find robot_launch)/configs/base_local_planner_params.yaml" command="load" />
 	</node>
 
-	<!--Launch rviz-->
+	<!-- Run Map Server -->
+	<!-- <node pkg="map_server" type="map_server" name="map_server" args="$(find robot_launch)/configs/simple_map.yaml"/> -->
+
+	<!-- Run rviz -->
 	<node pkg="rviz" type="rviz" name="rviz" args="-d $(find robot_launch)/rviz/navigation.vcg"/>
 
 </launch>

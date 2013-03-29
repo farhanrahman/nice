@@ -1,3 +1,5 @@
+map_type: costmap
+
 obstacle_range: 4.0
 raytrace_range: 3.0
 
@@ -6,13 +8,16 @@ raytrace_range: 3.0
 footprint: [[0.305, 0.278], [0.04, 0.193], [-0.04, 0.193], [-0.282, 0.178], [-0.282, -0.178], [-0.04, -0.193], [0.04, -0.193], [0.305, -0.278]]
 #robot_radius: ir_of_robot
 
+#Cost function parameters
 inflation_radius: 0.1
+cost_scaling_factor: 10.0
 
-observation_sources: camera
+#Set the observation sources i.e. the sensors from which the readings will be taken
+observation_sources: laser_scan_sensor
 
 laser_scan_sensor: {sensor_frame: base_laser_link, data_type: LaserScan, topic: base_scan, marking: true, clearing: true}
 
 camera : {sensor_frame: openni_depth_frame, data_type: PointCloud, topic: point_cloud_topic, marking: true, clearing: true}
 
-map_type: costmap
+#Set the tolerance we're willing to have for tf transforms
 transform_tolerance: 0.4 #seconds

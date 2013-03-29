@@ -1,0 +1,7 @@
+<library path="lib/libvfh_local_planner">
+  <class name="vfh_local_planner/VFHLocalPlannerROS" type="vfh_local_planner::VFHLocalPlannerROS" base_class_type="nav_core::BaseLocalPlanner">
+  <description>
+  	Implements the Vector Field Histogram obstacle avoidance to be used by the move_base package.
+  </description>
+  </class>
+</library>

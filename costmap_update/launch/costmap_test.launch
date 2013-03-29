@@ -14,10 +14,10 @@
 	<include file="$(find laser_node)/launch/laser_hokuyo.launch"/>
 
 	<!-- Include launching for gmapping -->
-  	<include file="$(find robot_launch)/launch/gmapping.launch"/>
+  	<include file="$(find robot_launch)/launch/gmapping/gmapping.launch"/>
  
 	<!--Run AMCL-->
-	<include file="$(find robot_launch)/launch/amcl_diff.launch" />
+	<include file="$(find robot_launch)/launch/amcl/amcl_diff.launch" />
 
 	<!--Run Move base-->
 	<node pkg="move_base" type="move_base" respawn="false" name="move_base" output="screen">

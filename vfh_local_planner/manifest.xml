@@ -1,0 +1,26 @@
+<package>
+  <description brief="vfh_local_planner">
+
+     local_planner
+
+  </description>
+  <author>Farhan</author>
+  <license>BSD</license>
+  <review status="unreviewed" notes=""/>
+  <url>http://ros.org/wiki/vfh_local_planner</url>
+  <depend package="roscpp"/>
+  <depend package="std_msgs"/>
+  <depend package="sensor_msgs"/>
+  <depend package="geometry_msgs"/>
+  <depend package="tf"/>
+  <depend package="base_local_planner"/>
+  <depend package="nav_core"/>
+  <depend package="nav_msgs"/>
+
+  <export>
+    <nav_core plugin="${prefix}/vfh_local_planner.xml" />
+  </export>
+
+</package>
+
+
