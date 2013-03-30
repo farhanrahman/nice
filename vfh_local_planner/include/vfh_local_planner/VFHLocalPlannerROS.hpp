@@ -22,7 +22,7 @@ class VFHLocalPlannerROS : public nav_core::BaseLocalPlanner {
 public:
 	VFHLocalPlannerROS(void);
 
-	~VFHLocalPlannerROS(void){}
+	~VFHLocalPlannerROS(void);
 
 	/**
 	 * @brief given the Pose and Odometry data of the robot, 
@@ -57,7 +57,6 @@ public:
 private:
 	void odometryCallback(const nav_msgs::Odometry::ConstPtr& odometryMsg);
 
-
 	bool initialised;
 	costmap_2d::Costmap2DROS *costmap_ros;
 	costmap_2d::Costmap2D costmap;
@@ -79,8 +78,27 @@ private:
 	double rot_stopped_vel;
 	double trans_stopped_vel;
 	double xy_goal_tolerance;
-	double yaw_goal_tolerance;	
+	double yaw_goal_tolerance;
 
+
+	/*Parameters for the vector field histogram*/
+	/*Default size of the active window*/
+	unsigned windowSize;
+
+	/*Direction vector*/
+	double **beta;
+
+	/*Magnitude vector*/
+	double **m;
+
+	/*Constants for the transformation from costmap
+	 *to window map*/
+	double a;
+	double b;
+
+	/*Maximum distance from robot base to the edge
+	 *of the active window*/
+	double dmax;
 };
 
 }
