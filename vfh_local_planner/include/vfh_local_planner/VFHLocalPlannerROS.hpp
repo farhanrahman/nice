@@ -46,7 +46,7 @@ public:
 	*/
 	bool setPlan(const std::vector<geometry_msgs::PoseStamped>& plan);
 
-	/*
+	/**
 	 * @brief initialise the VFH object with the required parameters
 	 * @param name the name of the node
 	 * @param tf pointer to a transform listener
@@ -55,7 +55,18 @@ public:
 	void initialize(std::string name, tf::TransformListener *tf, costmap_2d::Costmap2DROS* costmap_ros);
 
 private:
+	/**
+	* @brief callback function for recieving odometry data
+	* @param odometryMsg the odometry message that the topic
+	* is advertising*/
 	void odometryCallback(const nav_msgs::Odometry::ConstPtr& odometryMsg);
+
+	/**
+	 * @brief initialises the polar obstacle density histogram
+	 */
+	 void initialisePOD(void);
+
+	void initialiseActiveWindow(void);	 
 
 	bool initialised;
 	costmap_2d::Costmap2DROS *costmap_ros;
@@ -99,6 +110,28 @@ private:
 	/*Maximum distance from robot base to the edge
 	 *of the active window*/
 	double dmax;
+
+	/*Sector deviation*/
+	unsigned alpha;
+
+	/*Polar obstacle density*/
+	double *h;
+
+	/*Obstacle histogram of the surrounding
+	 *having values for each direction around
+	 *the robot*/
+	double hist[360];
+
+	/*The window that is placed on the costmap
+	 *around the robot*/
+	unsigned char **active_window;
+
+	/*Threshold value for the polar obstacle density*/
+	double threshold;
+
+	/*Maximum number of sectors to in a valley
+	 *for it to be considered as a wide one*/
+	unsigned smax;
 };
 
 }
