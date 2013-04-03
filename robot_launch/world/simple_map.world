@@ -99,7 +99,8 @@ erratic(
     color "red"
     
     #pose of the robot [x,y,z,heading]
-    pose [ 2.537 0.283 0.000 -52.372 ] 
+    #pose [ 2.537 0.283 0.000 -52.372 ]
+    pose [ -2.537 0.283 0.000 -52.372 ] 
 )
 
 # the Stage GUI window properties

@@ -1,0 +1,26 @@
+<package>
+  <description brief="nice_global_planner">
+
+     nice_global_planner
+
+  </description>
+  <author>Farhan</author>
+  <license>BSD</license>
+  <review status="unreviewed" notes=""/>
+  <url>http://ros.org/wiki/nice_global_planner</url>
+  <depend package="roscpp"/>
+  <depend package="nav_msgs"/>
+  <depend package="nav_core"/>
+  <depend package="geometry_msgs"/>
+  <depend package="sensor_msgs"/>
+  <depend package="tf"/>
+  <depend package="costmap_2d"/>
+
+  <export>
+    <nav_core plugin="${prefix}/nice_global_planner.xml" />
+  </export>
+
+
+</package>
+
+

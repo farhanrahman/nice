@@ -1,0 +1,7 @@
+<library path="lib/libnice_global_planner">
+  <class name="nice_global_planner/NiceGlobalPlannerROS" type="nice_global_planner::NiceGlobalPlannerROS" base_class_type="nav_core::BaseGlobalPlanner">
+  <description>
+  	Implements the NICE specific global planning for the robot base.
+  </description>
+  </class>
+</library>

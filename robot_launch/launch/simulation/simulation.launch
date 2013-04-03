@@ -14,7 +14,7 @@
 
 	<!--Run Move base-->
 	<node pkg="move_base" type="move_base" respawn="false" name="move_base" output="screen">
-		<param name="base_local_planner" value="vfh_local_planner/VFHLocalPlannerROS" />
+		<param name="base_local_planner" value="base_local_planner/TrajectoryPlannerROS" />
 		<rosparam file="$(find robot_launch)/configs/costmap_common_params.yaml" command="load" ns="global_costmap" />
 		<rosparam file="$(find robot_launch)/configs/costmap_common_params.yaml" command="load" ns="local_costmap" />
 		<rosparam file="$(find robot_launch)/configs/local_costmap_params.yaml" command="load" />
