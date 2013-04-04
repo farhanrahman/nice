@@ -6,7 +6,7 @@ PLUGINLIB_DECLARE_CLASS(nice_global_planner, NiceGlobalPlannerROS, nice_global_p
 
 namespace nice_global_planner{
 
-NiceGlobalPlanerROS::NiceGlobalPlannerROS(void){
+NiceGlobalPlannerROS::NiceGlobalPlannerROS(void){
 	initialised = false;
 }
 

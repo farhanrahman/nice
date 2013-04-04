@@ -3,6 +3,7 @@
 #include <vector>
 #include <assert.h>
 #include <map>
+#include <limits.h>
 
 typedef enum BinaryDecision{
 	LEFT = 0, RIGHT = 1
@@ -57,6 +58,15 @@ public:
 		return (this->decisionDim + 1)%dim;
 	}
 
+	T getSplittingValue(void){
+		return (*this).data[decisionDim];
+	}
+
+	unsigned getSplittingAxis(void){
+		return this->decisionDim;
+	}
+
+
 	bool equals(const KDNode<T> *node){
 		bool equal = false;
 
@@ -72,6 +82,19 @@ public:
 		
 		equal = true;
 		return equal;
+	}
+
+	double distance(const KDNode<T> *node){
+		return sqrt(this->sqDistance(node));
+	}
+
+	double sqDistance(const KDNode<T> *node){
+		double sqDistance = 0.0;
+		for(unsigned i = 0; i < data.size(); ++i){
+			double diff = this->data[i] - (*node).data[i];
+			sqDistance += diff*diff;
+		}
+		return sqDistance;
 	}
 
 	void printNode(void){
@@ -93,6 +116,7 @@ public:
 
 	std::vector<T> data;
 	KDNode *left, *right;
+	KDNode *parent;
 
 private:
 	unsigned decisionDim;
@@ -100,6 +124,7 @@ private:
 	void commonInitialiser(void){
 		left = NULL;
 		right = NULL;
+		parent = NULL;
 	}
 };
 
@@ -135,7 +160,51 @@ public:
 	}
 
 
+	KDNode<T> * nearestNeighbour(const std::vector<T> &data){
+		KDNode<T> newNode = KDNode<T>::createTempNode(data);
+		KDNode<T> *currentBest = root;
+		double currentBestDistance = root->sqDistance(const_cast<KDNode<T> *> (&newNode));
+		this->nearestNeighbour(root, currentBest, &currentBestDistance, const_cast<KDNode<T> *> (&newNode));
+		return currentBest;
+	}
+
 private:
+
+	void nearestNeighbour(KDNode<T> *node, KDNode<T> *currentBest, double *currentBestDistance, const KDNode<T> *newNode){
+		if(node == NULL){
+			return;
+		} else if(node->left == NULL && node->right == NULL){
+			double sqDistance = node->sqDistance(newNode);
+			if(sqDistance < (*currentBestDistance)){
+				currentBest = node;
+				(*currentBestDistance) = sqDistance;
+			}
+		} else {
+			BinaryDecision binaryDecision = node->getNextDirection(newNode);
+			if(binaryDecision == LEFT){
+				if((*newNode).data[node->getSplittingAxis()] - (*currentBestDistance) <= node->getSplittingValue()) {
+					nearestNeighbour(node->left, currentBest, currentBestDistance, newNode);
+				}
+
+				if((*newNode).data[node->getSplittingAxis()] + (*currentBestDistance) > node->getSplittingValue()) {
+					nearestNeighbour(node->right, currentBest, currentBestDistance, newNode);
+				}
+
+				return;
+			} else {
+				if((*newNode).data[node->getSplittingAxis()] + (*currentBestDistance) > node->getSplittingValue()) {
+					nearestNeighbour(node->right, currentBest, currentBestDistance, newNode);
+				}
+
+				if((*newNode).data[node->getSplittingAxis()] - (*currentBestDistance) <= node->getSplittingValue()) {
+					nearestNeighbour(node->left, currentBest, currentBestDistance, newNode);
+				}			
+
+				return;
+			}
+		}
+	}
+
 
 	KDNode<T> *findNodeHelper(KDNode<T> *node, const KDNode<T> *searchNode){
 		if(node == NULL){
@@ -176,8 +245,12 @@ private:
 			binaryDecision = node->getNextDirection(data);
 			if(binaryDecision == LEFT){
 				node->left = new KDNode<T>(data, node->getNextDecisionDim(this->dim));
+				KDNode<T> *child = node->left;
+				child->parent = node;
 			} else {
 				node->right = new KDNode<T>(data, node->getNextDecisionDim(this->dim));
+				KDNode<T> *child = node->right;
+				child->parent = node;
 			}
 			return;
 		} else {
