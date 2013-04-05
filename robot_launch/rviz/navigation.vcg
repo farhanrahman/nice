@@ -1,7 +1,7 @@
 Background\ ColorB=0
 Background\ ColorG=0
 Background\ ColorR=0
-Camera\ Config=187.151 0 0 0
+Camera\ Config=13.3832 0 0 0
 Camera\ Type=rviz::FixedOrientationOrthoViewController
 Current\ Goal.Alpha=1
 Current\ Goal.ColorB=0
@@ -48,6 +48,10 @@ Local\ Plan.ColorG=0.658824
 Local\ Plan.ColorR=1
 Local\ Plan.Enabled=1
 Local\ Plan.Topic=/move_base/TrajectoryPlannerROS/local_plan
+Map.Alpha=0.7
+Map.Draw\ Behind=0
+Map.Enabled=1
+Map.Topic=/map
 Obstacles.Alpha=1
 Obstacles.ColorB=0
 Obstacles.ColorG=0.0980392
@@ -66,9 +70,9 @@ Planner\ Plan.ColorG=0
 Planner\ Plan.ColorR=1
 Planner\ Plan.Enabled=1
 Planner\ Plan.Topic=/move_base/NavfnROS/plan
-Property\ Grid\ Splitter=555,78
-Property\ Grid\ State=expanded=.Global Options,Obstacles.Enabled,Inflated Obstacles.Enabled,Robot Footprint.Enabled,Global Plan.Enabled,Planner Plan.Enabled,Local Plan.Enabled,Current Goal.Enabled,TF.Enabled;splitterratio=0.5
-QMainWindow=000000ff00000000fd00000003000000000000011d000002cbfc0200000001fb000000100044006900730070006c006100790073010000001d000002cb000000ee00ffffff0000000100000131000002cbfc0200000003fb0000001e0054006f006f006c002000500072006f0070006500720074006900650073010000001d000000b70000006700fffffffb0000000a0056006900650077007301000000da00000151000000bb00fffffffb0000001200530065006c0065006300740069006f006e0100000231000000b70000006700ffffff00000003000004cf0000003efc0100000001fb0000000800540069006d00650100000000000004cf000002bf00ffffff00000275000002cb00000004000000040000000800000008fc0000000100000002000000010000000a0054006f006f006c00730100000000ffffffff0000000000000000
+Property\ Grid\ Splitter=591,78
+Property\ Grid\ State=expanded=.Global Options,Obstacles.Enabled,Inflated Obstacles.Enabled,Robot Footprint.Enabled,Global Plan.Enabled,Planner Plan.Enabled,Local Plan.Enabled,Current Goal.Enabled,TF.Enabled,Map.Enabled;splitterratio=0.5
+QMainWindow=000000ff00000000fd00000003000000000000011d000002effc0200000001fb000000100044006900730070006c006100790073010000001d000002ef000000ee00ffffff0000000100000131000002effc0200000003fb0000001e0054006f006f006c002000500072006f0070006500720074006900650073010000001d000000c00000006700fffffffb0000000a0056006900650077007301000000e300000163000000bb00fffffffb0000001200530065006c0065006300740069006f006e010000024c000000c00000006700ffffff00000003000004df0000003efc0100000001fb0000000800540069006d00650100000000000004df000002bf00ffffff00000285000002ef00000004000000040000000800000008fc0000000100000002000000010000000a0054006f006f006c00730100000000ffffffff0000000000000000
 Robot\ Footprint.Alpha=1
 Robot\ Footprint.ColorB=0.984314
 Robot\ Footprint.ColorG=0.0627451
@@ -99,6 +103,9 @@ Name=Static Map
 [Display10]
 ClassName=rviz::TFDisplay
 Name=TF
+[Display11]
+ClassName=rviz::MapDisplay
+Name=Map
 [Display2]
 ClassName=rviz::PoseArrayDisplay
 Name=Particle Cloud
@@ -130,7 +137,7 @@ base_link.Enabled=1
 map.Enabled=1
 odom.Enabled=1
 [Window]
-Height=848
-Width=1247
-X=1488
-Y=-222
+Height=884
+Width=1263
+X=1522
+Y=-182

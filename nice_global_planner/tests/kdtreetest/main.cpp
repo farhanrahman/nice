@@ -11,7 +11,7 @@ int main(int argc, char * argv[]){
 
 	srand (time(NULL));
 
-	KDTree<unsigned> kdTree(2);
+	nice_global_planner::KDTree<unsigned> kdTree(2);
 
 	std::vector<std::vector<unsigned> > stored;
 
@@ -33,7 +33,7 @@ int main(int argc, char * argv[]){
 
 	unsigned index = rand()%limit;
 
-	KDNode<unsigned> *nearest = kdTree.nearestNeighbour(stored[index]);
+	nice_global_planner::KDNode<unsigned> *nearest = kdTree.nearestNeighbour(stored[index]);
 
 	assert(stored[index][0] == (*nearest).data[0]);
 	assert(stored[index][1] == (*nearest).data[1]);

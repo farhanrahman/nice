@@ -5,6 +5,8 @@
 #include <map>
 #include <limits.h>
 
+namespace nice_global_planner{
+
 typedef enum BinaryDecision{
 	LEFT = 0, RIGHT = 1
 } BinaryDecision;
@@ -278,5 +280,7 @@ private:
 private:
 	unsigned dim;
 };
+
+}
 
 #endif

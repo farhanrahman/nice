@@ -1,6 +1,6 @@
 <launch>
 	<master auto="start" />
-	<node pkg="stage" name="stageros" type="stageros" args="$(find robot_launch)/world/simple_map.world"/>
+	<node pkg="stage" name="stageros" type="stageros" args="$(find robot_launch)/world/miguel.world"/>
 
   	<param name="/use_sim_time" value="true"/>
 <!--   	<include file="$(find navigation_stage)/move_base_config/move_base.xml"/>
@@ -10,11 +10,12 @@
 	<include file="$(find robot_launch)/launch/amcl/amcl_diff.launch" />
 
 	<!-- Run gmapping -->
-	<include file="$(find robot_launch)/launch/gmapping/gmapping.launch"/>
+	<!-- <include file="$(find robot_launch)/launch/gmapping/gmapping.launch"/> -->
 
 	<!--Run Move base-->
 	<node pkg="move_base" type="move_base" respawn="false" name="move_base" output="screen">
 		<param name="base_local_planner" value="base_local_planner/TrajectoryPlannerROS" />
+		<param name="base_global_planner" value="navfn/NavfnROS"/>
 		<rosparam file="$(find robot_launch)/configs/costmap_common_params.yaml" command="load" ns="global_costmap" />
 		<rosparam file="$(find robot_launch)/configs/costmap_common_params.yaml" command="load" ns="local_costmap" />
 		<rosparam file="$(find robot_launch)/configs/local_costmap_params.yaml" command="load" />
@@ -23,7 +24,7 @@
 	</node>
 
 	<!-- Run Map Server -->
-	<!-- <node pkg="map_server" type="map_server" name="map_server" args="$(find robot_launch)/configs/simple_map.yaml"/> -->
+	<node pkg="map_server" type="map_server" name="map_server" args="$(find robot_launch)/configs/miguel.yaml"/>
 
 	<!-- Run rviz -->
 	<node pkg="rviz" type="rviz" name="rviz" args="-d $(find robot_launch)/rviz/navigation.vcg"/>
