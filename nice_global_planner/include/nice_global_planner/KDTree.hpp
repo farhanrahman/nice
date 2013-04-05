@@ -164,43 +164,57 @@ public:
 		KDNode<T> newNode = KDNode<T>::createTempNode(data);
 		KDNode<T> *currentBest = root;
 		double currentBestDistance = root->sqDistance(const_cast<KDNode<T> *> (&newNode));
-		this->nearestNeighbour(root, currentBest, &currentBestDistance, const_cast<KDNode<T> *> (&newNode));
+		this->nearestNeighbour(root, &currentBest, currentBestDistance, const_cast<KDNode<T> *> (&newNode));
 		return currentBest;
 	}
 
 private:
 
-	void nearestNeighbour(KDNode<T> *node, KDNode<T> *currentBest, double *currentBestDistance, const KDNode<T> *newNode){
+	void nearestNeighbour(KDNode<T> *node, KDNode<T> **currentBest, double &currentBestDistance, const KDNode<T> *newNode){
 		if(node == NULL){
 			return;
-		} else if(node->left == NULL && node->right == NULL){
-			double sqDistance = node->sqDistance(newNode);
-			if(sqDistance < (*currentBestDistance)){
-				currentBest = node;
-				(*currentBestDistance) = sqDistance;
-			}
 		} else {
+			double sqDistance = node->sqDistance(newNode);
+			if(sqDistance < currentBestDistance){
+				(*currentBest) = node;
+				currentBestDistance = sqDistance;
+			}
+						
 			BinaryDecision binaryDecision = node->getNextDirection(newNode);
+			//double diff = abs((*newNode).data[node->getSplittingAxis()] - node->getSplittingValue());
+
+			// if(binaryDecision == LEFT){
+			// 	if(diff <= currentBestDistance){
+			// 		nearestNeighbour(node->left, currentBest, currentBestDistance, newNode);
+			// 	} else {
+			// 		nearestNeighbour(node->right, currentBest, currentBestDistance, newNode);
+			// 	}
+			// } else {
+			// 	if(diff < currentBestDistance){
+			// 		nearestNeighbour(node->right, currentBest, currentBestDistance, newNode);
+			// 	} else {
+			// 		nearestNeighbour(node->left, currentBest, currentBestDistance, newNode);
+			// 	}
+			// }
+			T newNodeSplitData = (*newNode).data[node->getSplittingAxis()];
+			T nodeSplitData = node->getSplittingValue();
 			if(binaryDecision == LEFT){
-				if((*newNode).data[node->getSplittingAxis()] - (*currentBestDistance) <= node->getSplittingValue()) {
+				if(newNodeSplitData - currentBestDistance <= nodeSplitData) {
 					nearestNeighbour(node->left, currentBest, currentBestDistance, newNode);
 				}
 
-				if((*newNode).data[node->getSplittingAxis()] + (*currentBestDistance) > node->getSplittingValue()) {
+				if(newNodeSplitData + currentBestDistance > nodeSplitData) {
 					nearestNeighbour(node->right, currentBest, currentBestDistance, newNode);
 				}
 
-				return;
 			} else {
-				if((*newNode).data[node->getSplittingAxis()] + (*currentBestDistance) > node->getSplittingValue()) {
+				if(newNodeSplitData + currentBestDistance > nodeSplitData) {
 					nearestNeighbour(node->right, currentBest, currentBestDistance, newNode);
 				}
 
-				if((*newNode).data[node->getSplittingAxis()] - (*currentBestDistance) <= node->getSplittingValue()) {
+				if(newNodeSplitData - currentBestDistance <= nodeSplitData) {
 					nearestNeighbour(node->left, currentBest, currentBestDistance, newNode);
-				}			
-
-				return;
+				}
 			}
 		}
 	}

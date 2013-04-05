@@ -13,10 +13,11 @@ int main(int argc, char * argv[]){
 
 	std::vector<std::vector<unsigned> > stored;
 
-	for(unsigned i = 0; i < 500; ++i){
+	for(unsigned i = 0; i < 100; ++i){
 		std::vector<unsigned> data;
-		data.push_back(rand()%1000);
-		data.push_back(rand()%1000);
+		data.resize(2);
+		data[0] = rand()%10;
+		data[1] = rand()%10;
 		stored.push_back(data);
 		kdTree.insert(data);
 	}
