@@ -87,7 +87,7 @@ floorplan
     bitmap "miguel.pgm"
     
     #size in meters
-    size [12.5 12.5 0.05]
+    size [12.5 12.5 0.5]
     
     # pose of the map
     pose [0 0 0 1.0]
