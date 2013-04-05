@@ -9,6 +9,6 @@ include_directories($ENV{ROS_WORKSPACE}/nice/nice_global_planner/include/)
 link_directories(${PCL_LIBRARY_DIRS})
 add_definitions(${PCL_DEFINITIONS})
 
-add_executable (kdtree_search kdtree_search.cpp)
-#add_executable(kdtree_search main.cpp)
+#add_executable (kdtree_search kdtree_search.cpp)
+add_executable(kdtree_search main.cpp)
 target_link_libraries (kdtree_search ${PCL_LIBRARIES})

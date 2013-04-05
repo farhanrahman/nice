@@ -5,41 +5,40 @@
 #include <stdlib.h>
 #include <utility>
 #include <assert.h>
+#include <ctime>
 
 int main(int argc, char * argv[]){
 
+	srand (time(NULL));
+
 	KDTree<unsigned> kdTree(2);
-	//unsigned store = 0;
 
 	std::vector<std::vector<unsigned> > stored;
 
-	for(unsigned i = 0; i < 100; ++i){
+	unsigned limit = 10000;
+	unsigned range = 1000;
+
+	for(unsigned i = 0; i < limit; ++i){
 		std::vector<unsigned> data;
 		data.resize(2);
-		data[0] = rand()%10;
-		data[1] = rand()%10;
+		data[0] = rand()%range;
+		data[1] = rand()%range;
 		stored.push_back(data);
 		kdTree.insert(data);
 	}
 
-	//kdTree.printTreeFromRoot();
-	//std::cout << store-1 << std::endl;
 	for(unsigned i = 0; i < stored.size(); ++i){
-		/*std::cout << "stored[" << i << "][0]: " << stored[i][0];
-		std::cout << " stored[" << i << "][1]: " << stored[i][1];
-		std::cout << ": kdTree.findNode(stored[" << i << "]): ";
-		std::cout << kdTree.findNode(stored[i]) << std::endl;*/
 		assert(kdTree.findNode(stored[i]));
 	}
 
-	unsigned index = 2;
+	unsigned index = rand()%limit;
 
 	KDNode<unsigned> *nearest = kdTree.nearestNeighbour(stored[index]);
 
-	std::cout << "stored[" << index << "][0]: " << stored[index][0];
-	std::cout << " nearestneighbour[0]: " << (*nearest).data[0] << std::endl;	
-	std::cout << "stored[" << index << "][1]: " << stored[index][1];
-	std::cout << " nearestneighbour[1]: " << (*nearest).data[1] << std::endl;
+	assert(stored[index][0] == (*nearest).data[0]);
+	assert(stored[index][1] == (*nearest).data[1]);
+
+	std::cout << "TEST PASSED" << std::endl;
 
 	return 0;
 }

@@ -181,21 +181,7 @@ private:
 			}
 						
 			BinaryDecision binaryDecision = node->getNextDirection(newNode);
-			//double diff = abs((*newNode).data[node->getSplittingAxis()] - node->getSplittingValue());
 
-			// if(binaryDecision == LEFT){
-			// 	if(diff <= currentBestDistance){
-			// 		nearestNeighbour(node->left, currentBest, currentBestDistance, newNode);
-			// 	} else {
-			// 		nearestNeighbour(node->right, currentBest, currentBestDistance, newNode);
-			// 	}
-			// } else {
-			// 	if(diff < currentBestDistance){
-			// 		nearestNeighbour(node->right, currentBest, currentBestDistance, newNode);
-			// 	} else {
-			// 		nearestNeighbour(node->left, currentBest, currentBestDistance, newNode);
-			// 	}
-			// }
 			T newNodeSplitData = (*newNode).data[node->getSplittingAxis()];
 			T nodeSplitData = node->getSplittingValue();
 			if(binaryDecision == LEFT){
