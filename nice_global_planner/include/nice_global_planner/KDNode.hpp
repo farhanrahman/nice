@@ -85,6 +85,23 @@ public:
 		return equal;
 	}
 
+	bool equals(const std::vector<T>& nodeData){
+		bool equal = false;
+
+		if(nodeData.size() != (*this).data.size()){
+			return equal;
+		}
+
+		for(unsigned i = 0; i < nodeData.size(); ++i){
+			if((*this).data[i] != nodeData[i]){
+				return equal;
+			}
+		}
+		
+		equal = true;
+		return equal;
+	}	
+
 	double distance(const KDNode<T> *node){
 		return sqrt(this->sqDistance(node));
 	}

@@ -7,6 +7,7 @@
 #include <string>
 #include <costmap_2d/costmap_2d.h>
 #include <costmap_2d/costmap_2d_ros.h>
+#include <nice_global_planner/RRTPlanner.hpp>
 
 namespace nice_global_planner{
 

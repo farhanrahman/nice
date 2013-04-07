@@ -21,6 +21,11 @@ public:
 		root = NULL;
 	}
 
+	KDTree(unsigned dim, const std::vector<T>& initData)
+	: dim(dim) {
+		root = new KDNode<T>(initData,0);
+	}
+
 	~KDTree(void){
 		this->pruneTree(this->root);
 	}
@@ -30,6 +35,21 @@ public:
 			root = new KDNode<T>(data, 0);
 		} else {
 			this->insertHelper(root, data);
+		}
+	}
+
+	/**
+	 * @brief Inserts a new node with data given
+	 *  this method may be unsafe as it is expected
+	 *  that the node is first found out with nearest
+	 *  neigbourSearch or findNode method. This method
+	 *  should be used with caution.
+	 * @param node Node to start traversing from
+	 * @param data New data to be inserted
+	 */
+	void insertFromNode(KDNode<T> *node, const std::vector<T> &data){
+		if(node != NULL){
+			this->insertHelper(node, data);
 		}
 	}
 
@@ -50,6 +70,13 @@ public:
 		double currentBestDistance = root->sqDistance(const_cast<KDNode<T> *> (&newNode));
 		this->nearestNeighbour(root, &currentBest, currentBestDistance, const_cast<KDNode<T> *> (&newNode));
 		return currentBest;
+	}
+
+	void nearestNeighbourInsert(const std::vector<T> &data){
+		KDNode<T> *nearestNeighbour = this->nearestNeighbour(data);
+		if(!nearestNeighbour->equals(data)){
+			this->insertHelper(nearestNeighbour, data);
+		}
 	}
 
 private:
