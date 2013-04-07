@@ -155,13 +155,17 @@ private:
 		if(node->getNextStorageNode(data) == NULL){
 			binaryDecision = node->getNextDirection(data);
 			if(binaryDecision == LEFT){
-				node->left = new KDNode<T>(data, node->getNextDecisionDim(this->dim));
-				KDNode<T> *child = node->left;
-				child->parent = node;
+				if(!node->equals(data)){
+					node->left = new KDNode<T>(data, node->getNextDecisionDim(this->dim));
+					KDNode<T> *child = node->left;
+					child->parent = node;
+				}
 			} else {
-				node->right = new KDNode<T>(data, node->getNextDecisionDim(this->dim));
-				KDNode<T> *child = node->right;
-				child->parent = node;
+				if(!node->equals(data)){
+					node->right = new KDNode<T>(data, node->getNextDecisionDim(this->dim));
+					KDNode<T> *child = node->right;
+					child->parent = node;
+				}
 			}
 			return;
 		} else {
