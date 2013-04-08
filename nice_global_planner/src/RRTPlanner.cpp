@@ -72,7 +72,7 @@ void RRTPlanner::vector2DToPoint(
 
 void RRTPlanner::vector2DToPoseStamped(
 	const std::vector<double>& data,
-	geometry_msgs::PoseStamped poseStamped,
+	geometry_msgs::PoseStamped& poseStamped,
 	ros::Time time
 ){
 	poseStamped.header.stamp = time;
@@ -116,15 +116,13 @@ bool RRTPlanner::makePlan(
 	pointToKDNodeVector2D(start.position,sdata);
 
 	kdtree->insert(sdata);
-
  	while(!goalReached(qnew,gdata)){
 	 	p = this->choosePoint(this->goal);
 	 	pointToKDNodeVector2D(p,pdata);
 	 	q = kdtree->nearestNeighbour(pdata);
 	 	qnew = extend(q->data, pdata);
-
 	 	if(point2DInFreeConfig(qnew)){
-	 		(*this).kdtree->insertFromNode(q, qnew);
+	 		(*this).kdtree->insert(qnew);
 	 	}
  	}
 
@@ -133,10 +131,14 @@ bool RRTPlanner::makePlan(
 
  	while (!q->equals(root)){
 	 	geometry_msgs::PoseStamped pStamped;
-	 	vector2DToPoseStamped(q->data, pStamped, (ros::Time) t);
+	 	vector2DToPoseStamped(q->data, pStamped, (ros::Time) t);	 	
  		plan.push_back(pStamped);
  		q = q->parent;
  	}
+
+ 	geometry_msgs::PoseStamped pStamped;
+ 	vector2DToPoseStamped(root->data, pStamped, (ros::Time) t);	
+ 	plan.push_back(pStamped);
 
  	return plan.size() != 0;
 

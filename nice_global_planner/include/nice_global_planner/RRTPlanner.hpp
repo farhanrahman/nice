@@ -77,7 +77,7 @@ private:
 
 	void vector2DToPoseStamped(
 		const std::vector<double>& data,
-		geometry_msgs::PoseStamped poseStamped,
+		geometry_msgs::PoseStamped& poseStamped,
 		ros::Time time
 	);
 
