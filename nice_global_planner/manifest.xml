@@ -15,6 +15,7 @@
   <depend package="sensor_msgs"/>
   <depend package="tf"/>
   <depend package="costmap_2d"/>
+  <depend package="base_local_planner"/>
 
   <export>
     <nav_core plugin="${prefix}/nice_global_planner.xml" />

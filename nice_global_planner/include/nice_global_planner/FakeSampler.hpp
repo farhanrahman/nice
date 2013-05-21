@@ -43,6 +43,14 @@ public:
 		return ret;
 	}
 
+	bool point2DInFreeConfig(const std::vector<double> &point, double yaw = 0){
+		return true;
+	}
+
+	void initialise(CostCalculatorDelegate *costCalculatorDelegate) {
+
+	}
+
 private:
 	double **costmap;
 	unsigned size;

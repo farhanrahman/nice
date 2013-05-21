@@ -72,12 +72,12 @@ public:
 		return currentBest;
 	}
 
-	void nearestNeighbourInsert(const std::vector<T> &data){
-		KDNode<T> *nearestNeighbour = this->nearestNeighbour(data);
-		if(!nearestNeighbour->equals(data)){
-			this->insertHelper(nearestNeighbour, data);
-		}
-	}
+	// void nearestNeighbourInsert(const std::vector<T> &data){
+	// 	KDNode<T> *nearestNeighbour = this->nearestNeighbour(data);
+	// 	if(!nearestNeighbour->equals(data)){
+	// 		this->insertHelper(nearestNeighbour, data);
+	// 	}
+	// }
 
 private:
 

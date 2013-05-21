@@ -3,7 +3,7 @@
 #include <geometry_msgs/Pose.h>
 #include <geometry_msgs/Point.h>
 #include <string>
-
+#include "CostCalculatorDelegate.hpp"
 
 namespace nice_global_planner
 {
@@ -34,6 +34,20 @@ public:
 	  * @return std::string Returns the global frame id
 	  */
 	virtual std::string getGlobalFrameID(void) = 0;
+
+	/**
+	 * @brief Method should return whether the point being passed
+	 *  lies in the free configuration space
+	 * @param point The vector point to be checked
+	 * @return True if given point lies in free configuration
+	 */
+	virtual bool point2DInFreeConfig(const std::vector<double> &point, double yaw = 0) = 0;
+
+	/*@brief Initialises the sampler with the cost calculator delegate
+	 *@param costCalculatorDelegate Delegate which calculates the
+	 * legality of occupying a cell in the costmap
+	 **/
+	virtual void initialise(CostCalculatorDelegate *costCalculatorDelegate) = 0;
 
 	/**
 	 * @brief Destructor

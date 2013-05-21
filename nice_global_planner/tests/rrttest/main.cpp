@@ -1,7 +1,7 @@
 #include <nice_global_planner/RRTPlanner.hpp>
 #include <nice_global_planner/FakeSampler.hpp>
-#include <utils/Timer.hpp>
-#include <utils/DefaultTimer.hpp>
+#include <utils/IStamper.hpp>
+#include <utils/DefaultStamper.hpp>
 #include <geometry_msgs/Pose.h>
 #include <geometry_msgs/PoseStamped.h>
 #include <vector>
@@ -18,7 +18,9 @@ int main(int argc, char const *argv[])
 
 	nice_global_planner::Sampler *sampler = new nice_global_planner::FakeSampler(size);
 
-	utils::Timer *timer = new utils::DefaultTimer();
+	// utils::Timer *timer = new utils::DefaultTimer();
+
+	utils::IStamper *stamper = new utils::DefaultStamper();
 
 	geometry_msgs::Pose start;
 	geometry_msgs::Pose goal;
@@ -29,7 +31,7 @@ int main(int argc, char const *argv[])
 	goal.position.x = rand()%size;
 	goal.position.y = rand()%size;
 
-	nice_global_planner::RRTPlanner rrtPlanner(start, goal, timer, sampler);
+	nice_global_planner::RRTPlanner rrtPlanner(start, goal, stamper, sampler);
 
 	std::vector<geometry_msgs::PoseStamped> plan;
 
@@ -51,7 +53,7 @@ int main(int argc, char const *argv[])
 
 
 	delete sampler;
-	delete timer;
+	delete stamper;
 
 	return 0;
 }

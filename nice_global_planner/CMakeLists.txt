@@ -31,5 +31,5 @@ set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/lib)
 
 include_directories($ENV{ROS_WORKSPACE}/nice/utils/include)
 rosbuild_add_boost_directories()
-rosbuild_add_library(${PROJECT_NAME} src/NiceGlobalPlannerROS.cpp src/RRTPlanner.cpp src/CostmapSampler.cpp)
+rosbuild_add_library(${PROJECT_NAME} src/NiceGlobalPlannerROS.cpp src/RRTPlanner.cpp src/Costmap2DSampler.cpp)
 rosbuild_link_boost(${PROJECT_NAME} thread)

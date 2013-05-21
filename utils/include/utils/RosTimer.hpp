@@ -1,15 +1,14 @@
-##ifndef ROS_TIMER
+#ifndef ROS_TIMER
 #define ROS_TIMER 
 
-#include "Timer.hpp"
 #include <ros/ros.h>
 
 namespace utils{
 
-class RosTimer : public Timer
+class RosTimer
 {
 public:
-	double getTime(void) {
+	ros::Time getTime(void) {
 		return ros::Time::now();
 	}
 };

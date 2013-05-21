@@ -9,7 +9,7 @@
 
 #include <vector>
 
-#include <utils/Timer.hpp>
+#include <utils/IStamper.hpp>
 
 #include <nice_global_planner/Sampler.hpp>
 
@@ -26,7 +26,7 @@ public:
 	RRTPlanner(
 		const geometry_msgs::Pose& start, 
 		const geometry_msgs::Pose& goal,
-		utils::Timer *timer,
+		utils::IStamper *stamper,
 		Sampler *sampler
 	);
 
@@ -49,6 +49,10 @@ public:
 	 	std::vector<geometry_msgs::PoseStamped> &plan
 	 );
 
+	 /*@brief cleans up the KDTree and reallocates space for
+	  * path planning*/
+	 void refresh(void);
+
 private:
 
 	geometry_msgs::Point choosePoint(const geometry_msgs::Pose& goal);
@@ -67,18 +71,17 @@ private:
 		geometry_msgs::Point& point
 	);
 
-	bool point2DInFreeConfig(const std::vector<double>& point);
-
-	std::vector<double> extend(std::vector<double> q, std::vector<double> p);
+	bool point2DInFreeConfig(const std::vector<double>& point, double yaw = 0);
 
 	double distance2D(const std::vector<double> &p, const std::vector<double> &q);
 
 	bool goalReached(const std::vector<double>& qnew, const std::vector<double>& goalPoint);
 
+	std::vector<double> extend(const std::vector<double> &nearest, const std::vector<double> &target);
+
 	void vector2DToPoseStamped(
 		const std::vector<double>& data,
-		geometry_msgs::PoseStamped& poseStamped,
-		ros::Time time
+		geometry_msgs::PoseStamped& poseStamped
 	);
 
 	geometry_msgs::Pose start;
@@ -87,13 +90,17 @@ private:
 	boost::mutex goalLock;
 	boost::mutex startLock; 
 
+	boost::mutex kdTreeLock;
+
 	KDTree<double> *kdtree;
 
 	double goalTolerance;
 
-	utils::Timer *timer;
+	utils::IStamper *stamper;
 
 	Sampler *sampler;
+
+	double maxDistance_;
 
 };
 }
