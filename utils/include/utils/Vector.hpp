@@ -138,6 +138,12 @@ public:
     return sqrt(xx*xx + yy*yy);
   }
 
+  float SqDistance(const Vec2f& V){
+    float xx = data[0] - V.x();
+    float yy = data[1] - V.y();
+    return xx*xx + yy*yy;
+  }
+
 private:
 
   // REPRESENTATION

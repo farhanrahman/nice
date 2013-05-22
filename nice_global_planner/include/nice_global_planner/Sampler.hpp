@@ -18,10 +18,11 @@ public:
 	 *  is being represented in any data structure. The derived classes
 	 *  overriding this method will be responsible for defining the costmap
 	 * @param goal Goal position to bias the sampling
+	 * @param nearest Nearest point from which the sampling should be done 
 	 * @return geometry_msgs::Point A sampled point from the environment
 	 */
 
-	virtual geometry_msgs::Point samplePoint(const geometry_msgs::Pose& goal) = 0;
+	virtual geometry_msgs::Point samplePoint(const geometry_msgs::Pose& goal, const geometry_msgs::Pose& start) = 0;
 
 	/**
 	 * @brief Method to be called by delegate when the sampler needs

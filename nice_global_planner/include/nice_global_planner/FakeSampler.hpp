@@ -28,7 +28,7 @@ public:
 		delete[] costmap;
 	}
 
-	geometry_msgs::Point samplePoint(const geometry_msgs::Pose& goal){
+	geometry_msgs::Point samplePoint(const geometry_msgs::Pose& goal, const geometry_msgs::Pose& start){
 		geometry_msgs::Point ret;
 		ret.x = rand() % size;
 		ret.y = rand() % size;

@@ -55,7 +55,7 @@ public:
 
 private:
 
-	geometry_msgs::Point choosePoint(const geometry_msgs::Pose& goal);
+	geometry_msgs::Point choosePoint(const geometry_msgs::Pose& goal, const geometry_msgs::Pose& start);
 	
 	/**
 	 * @brief Converts a geometry point to vector format
@@ -71,7 +71,7 @@ private:
 		geometry_msgs::Point& point
 	);
 
-	bool point2DInFreeConfig(const std::vector<double>& point, double yaw = 0);
+	bool point2DInFreeConfig(const std::vector<double>& point, const std::vector<double>& goal);
 
 	double distance2D(const std::vector<double> &p, const std::vector<double> &q);
 
@@ -101,6 +101,7 @@ private:
 	Sampler *sampler;
 
 	double maxDistance_;
+	double maxDistanceSq_;
 
 };
 }

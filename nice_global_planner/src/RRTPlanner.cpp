@@ -16,7 +16,8 @@ RRTPlanner::RRTPlanner(
 {
 	this->kdtree = new KDTree<double>(2);
 	this->goalTolerance = 0.001;
-	this->maxDistance_ = 100;
+	this->maxDistance_ = 8;
+	this->maxDistanceSq_ = maxDistance_*maxDistance_;
 }
 
 RRTPlanner::~RRTPlanner(void){
@@ -33,8 +34,8 @@ void RRTPlanner::updateStart(const geometry_msgs::Pose& start){
 	this->start = start;
 }
 
-geometry_msgs::Point RRTPlanner::choosePoint(const geometry_msgs::Pose& goal){
-	return sampler->samplePoint(goal);
+geometry_msgs::Point RRTPlanner::choosePoint(const geometry_msgs::Pose& goal, const geometry_msgs::Pose& start){
+	return sampler->samplePoint(goal,start);
 }
 
 double RRTPlanner::distance2D(const std::vector<double> &p, const std::vector<double> &q){
@@ -47,7 +48,13 @@ bool RRTPlanner::goalReached(const std::vector<double>& qnew, const std::vector<
 	return distance2D(qnew, goalPoint) < goalTolerance;
 }
 
-bool RRTPlanner::point2DInFreeConfig(const std::vector<double>& point, double yaw){
+bool RRTPlanner::point2DInFreeConfig(const std::vector<double>& point, const std::vector<double>& goal){
+	Vec2f end(goal[0], goal[1]);
+	Vec2f start(point[0], point[1]);
+	Vec2f endStart = end - start;
+
+	double yaw = atan2(endStart.y(), endStart.x());
+
 	return sampler->point2DInFreeConfig(point, yaw);
 }
 
@@ -101,46 +108,22 @@ std::vector<double> RRTPlanner::extend(const std::vector<double> &nearest, const
 	Vec2f start(startX, startY);
 	Vec2f end(targetX, targetY);
 
-	double distance = start.Distance(end);
+	double sqDistance = start.SqDistance(end);
 
 	std::vector<double> ret;
 	ret.resize(2);
 	ret[0] = target[0];
 	ret[1] = target[1];
 
-	if(distance > maxDistance_){
+	if(sqDistance > maxDistanceSq_){
 		Vec2f direction = (end - start).Normalized();
-		double alpha = maxDistance_ / distance;
+		double alpha = maxDistance_ / sqrt(sqDistance);
 		Vec2f point = start + direction*alpha;
 		ret[0] = point.x();
 		ret[1] = point.y();
 	}
 
 	return ret;
-
-
-	// Vec2f endStart = start - end;
-	// Vec2f prev = start;
-	// for (double alpha = 0.0; alpha <= 1.0; alpha += 0.1){
-	// 	Vec2f point = endStart*alpha;
-	// 	point += start;
-	// 	std::vector<double> p;
-	// 	p.resize(2);
-	// 	p[0] = point.x();
-	// 	p[1] = point.y();
-
-	// 	if(!point2DInFreeConfig(p)){
-	// 		break;
-	// 	}
-
-	// 	prev = point;
-	// }
-	// std::vector<double> ret;
-	// ret.resize(2);
-	// ret[0] = prev.x();
-	// ret[1] = prev.y();
-
-	// return ret;
 }
 
 bool RRTPlanner::makePlan(
@@ -177,11 +160,11 @@ bool RRTPlanner::makePlan(
 		boost::mutex::scoped_lock(kdTreeLock);
 		kdtree->insert(sdata);
 	 	while(!goalReached(extended,gdata)){
-		 	target = this->choosePoint(this->goal);
+		 	target = this->choosePoint(this->goal, this->start);
 		 	pointToKDNodeVector2D(target,targetData);
 		 	nearestNode = kdtree->nearestNeighbour(targetData);
 		 	extended = this->extend(nearestNode->data, targetData);
-		 	if(point2DInFreeConfig(extended)){
+		 	if(point2DInFreeConfig(extended,gdata)){
 		 		(*this).kdtree->insert(extended);
 		 	}
 	 	}

@@ -10,6 +10,10 @@
 
 #include <boost/thread/mutex.hpp>
 
+#include <utils/RandomNumberGenerator.hpp>
+
+#define THRESHOLD 50.0
+
 namespace nice_global_planner{
 
 class Costmap2DSampler : public Sampler
@@ -18,7 +22,7 @@ public:
 	Costmap2DSampler(costmap_2d::Costmap2DROS *costmap_2d_ros);
 	~Costmap2DSampler(void);
 
-	geometry_msgs::Point samplePoint(const geometry_msgs::Pose& goal);
+	geometry_msgs::Point samplePoint(const geometry_msgs::Pose& goal, const geometry_msgs::Pose& start);
 
 	void update(void);
 
@@ -31,12 +35,17 @@ public:
 	}
 
 private:
+	geometry_msgs::Point uniformSample(const geometry_msgs::Pose& goal, const geometry_msgs::Pose& start);
+	geometry_msgs::Point gaussianSample(const geometry_msgs::Pose& goal, const geometry_msgs::Pose& start);
+
 	costmap_2d::Costmap2DROS *costmap_2d_ros;
 	costmap_2d::Costmap2D costmap;
 
 	boost::mutex costmapLock;
 
 	CostCalculatorDelegate *costCalculatorDelegate;
+
+	utils::RandomNumberGenerator rng;
 
 
 };
