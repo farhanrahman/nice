@@ -55,6 +55,15 @@ public:
 	~NiceGlobalPlannerROS(void);
 
 private:
+	/*@brief Takes in a path planned by a planner and removes points
+	 * which are not close enough to the objective distance*/
+	void smoothPath(
+				std::vector<geometry_msgs::PoseStamped>& plannerPlan,
+				const geometry_msgs::PoseStamped& start,
+				const geometry_msgs::PoseStamped& goal,
+				std::vector<geometry_msgs::PoseStamped>& plan
+	);
+
 	std::string nodeName;
 
 	costmap_2d::Costmap2DROS* costmap_ros;

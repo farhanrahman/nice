@@ -16,7 +16,7 @@ RRTPlanner::RRTPlanner(
 {
 	this->kdtree = new KDTree<double>(2);
 	this->goalTolerance = 0.001;
-	this->maxDistance_ = 8;
+	this->maxDistance_ = 0.5;
 	this->maxDistanceSq_ = maxDistance_*maxDistance_;
 }
 

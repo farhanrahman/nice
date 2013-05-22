@@ -4,6 +4,8 @@
 #include <sstream>
 #include <string>
 #include <algorithm>
+#include <utils/Vector.hpp>
+#include <limits>
 
 //Declare the NiceGlobalPlannerROS as a nav_core::BaseGlobalPlanner class
 PLUGINLIB_DECLARE_CLASS(nice_global_planner, NiceGlobalPlannerROS, nice_global_planner::NiceGlobalPlannerROS, nav_core::BaseGlobalPlanner); 
@@ -48,6 +50,27 @@ double NiceGlobalPlannerROS::footprintCost(double x_i, double y_i, double theta_
 	double footprint_cost = world_model_->footprintCost(robot_position, oriented_footprint, inscribed_radius_, circumscribed_radius_);
 	return footprint_cost;
 }
+
+void NiceGlobalPlannerROS::smoothPath(
+			std::vector<geometry_msgs::PoseStamped>& plannerPlan,
+			const geometry_msgs::PoseStamped& start,
+			const geometry_msgs::PoseStamped& goal,
+			std::vector<geometry_msgs::PoseStamped>& plan
+){
+	Vec2f g(goal.pose.position.x, goal.pose.position.y);
+	double minDistance = std::numeric_limits<double>::max();
+
+	for(std::vector<geometry_msgs::PoseStamped>::reverse_iterator it = plannerPlan.rbegin();
+		it != plannerPlan.rend(); ++it){
+			Vec2f point((*it).pose.position.x, (*it).pose.position.y);
+			double distance = point.Distance(g);
+			if (distance < minDistance){
+				minDistance = distance;
+				plan.push_back((*it));
+			}
+	}
+}
+
 
 bool NiceGlobalPlannerROS::makePlan(const geometry_msgs::PoseStamped& start,
 	const geometry_msgs::PoseStamped& goal, std::vector<geometry_msgs::PoseStamped>& plan)
@@ -103,7 +126,7 @@ bool NiceGlobalPlannerROS::makePlan(const geometry_msgs::PoseStamped& start,
         target_x = start_x;
         target_y = start_y;
         target_yaw = start_yaw;
-        ROS_WARN("The carrot planner could not find a valid plan for this goal");
+        ROS_WARN("The planner could not find a valid plan for this goal");
         break;
       }
       target_x = start_x + scale * diff_x;
@@ -129,12 +152,15 @@ bool NiceGlobalPlannerROS::makePlan(const geometry_msgs::PoseStamped& start,
     new_goal.pose.orientation.z = goal_quat.z();
     new_goal.pose.orientation.w = goal_quat.w();
 
+	std::vector<geometry_msgs::PoseStamped> rrtPlan;
+
 	(*this).planner->updateGoal(new_goal.pose);
 	(*this).planner->updateStart(start.pose);
 	(*this).planner->refresh();
-	(*this).planner->makePlan(start.pose, goal.pose, plan);
+	(*this).planner->makePlan(start.pose, goal.pose, rrtPlan);
 
-	std::reverse(plan.begin(), plan.end());
+	// std::reverse(plan.begin(), plan.end());
+	this->smoothPath(rrtPlan, start, goal, plan);
 
 	for(unsigned i = 0; i < plan.size(); ++i){
 		std::cout << plan[i].pose.position.x << "," 

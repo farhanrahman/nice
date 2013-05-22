@@ -12,7 +12,7 @@
 
 #include <utils/RandomNumberGenerator.hpp>
 
-#define THRESHOLD 50.0
+#define THRESHOLD 100.0
 
 namespace nice_global_planner{
 
