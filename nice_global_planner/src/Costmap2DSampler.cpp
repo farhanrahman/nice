@@ -64,11 +64,7 @@ geometry_msgs::Point Costmap2DSampler::gaussianSample(const geometry_msgs::Pose&
 	ret.z = 0.0;
 
 	return ret;
-
-
-
 }
-
 
 geometry_msgs::Point Costmap2DSampler::samplePoint(const geometry_msgs::Pose& goal, const geometry_msgs::Pose& start){
 	return this->gaussianSample(goal, start);

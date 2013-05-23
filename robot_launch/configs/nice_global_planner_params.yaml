@@ -1,0 +1,3 @@
+NiceGlobalPlannerROS:
+   goal_tolerance: 0.001
+   max_distance: 0.5

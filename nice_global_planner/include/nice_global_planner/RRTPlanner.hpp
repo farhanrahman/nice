@@ -27,7 +27,9 @@ public:
 		const geometry_msgs::Pose& start, 
 		const geometry_msgs::Pose& goal,
 		utils::IStamper *stamper,
-		Sampler *sampler
+		Sampler *sampler,
+		double goalTolerance = 0.001,
+		double maxDistance = 0.5
 	);
 
 	~RRTPlanner(void);

@@ -8,15 +8,17 @@ RRTPlanner::RRTPlanner(
 	const geometry_msgs::Pose& start, 
 	const geometry_msgs::Pose& goal,
 	utils::IStamper *stamper,
-	Sampler *sampler
+	Sampler *sampler,
+	double goalTolerance,
+	double maxDistance
 	) : start(start),
 		goal(goal),
 		stamper(stamper),
 		sampler(sampler)
 {
 	this->kdtree = new KDTree<double>(2);
-	this->goalTolerance = 0.001;
-	this->maxDistance_ = 0.5;
+	this->goalTolerance = goalTolerance;
+	this->maxDistance_ = maxDistance;
 	this->maxDistanceSq_ = maxDistance_*maxDistance_;
 }
 

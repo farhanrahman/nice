@@ -178,6 +178,14 @@ void NiceGlobalPlannerROS::initialize(std::string name, costmap_2d::Costmap2DROS
 		ROS_WARN("NiceGlobalPlannerROS already initialised");
 		return;
 	}
+	
+	ros::NodeHandle nh("~/" + name);
+
+	double goalTolerance = 0.0;
+	double maxDistance = 0.0;
+
+	nh.param("goal_tolerance", goalTolerance, 0.001);
+	nh.param("max_distance", maxDistance, 0.5);
 
 	geometry_msgs::Pose start;
 	geometry_msgs::Pose goal;
@@ -193,7 +201,7 @@ void NiceGlobalPlannerROS::initialize(std::string name, costmap_2d::Costmap2DROS
 
 	this->stamper = new utils::RosStamper();
 
-	this->planner = new RRTPlanner(start, goal, stamper, sampler);
+	this->planner = new RRTPlanner(start, goal, stamper, sampler, goalTolerance, maxDistance);
 
 	costmap_ros->getCostmapCopy(costmap);
 	world_model_ = new base_local_planner::CostmapModel(costmap); 
