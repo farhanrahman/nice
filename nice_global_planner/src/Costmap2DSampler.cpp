@@ -2,10 +2,11 @@
 
 namespace nice_global_planner{
 
-Costmap2DSampler::Costmap2DSampler(costmap_2d::Costmap2DROS *costmap_2d_ros)
+Costmap2DSampler::Costmap2DSampler(costmap_2d::Costmap2DROS *costmap_2d_ros, double thresh)
 	: costmap_2d_ros(costmap_2d_ros)
 {
 	(*this).costmap_2d_ros->getCostmapCopy(costmap);
+	(*this).thresh = thresh;
 }
 
 Costmap2DSampler::~Costmap2DSampler(void){
@@ -81,11 +82,12 @@ std::string Costmap2DSampler::getGlobalFrameID(void){
 
 bool Costmap2DSampler::point2DInFreeConfig(const std::vector<double> &point, double yaw){
 	double cost = costCalculatorDelegate->footprintCost(point[0], point[1], yaw);
+	unsigned char ucost = (unsigned char) cost;
 	if(cost < 0) {
 		return false;
-	} else if (cost <= THRESHOLD){
-		return true;
-	}
+	} else if(ucost == costmap_2d::LETHAL_OBSTACLE || ucost == costmap_2d::INSCRIBED_INFLATED_OBSTACLE || ucost == costmap_2d::NO_INFORMATION){
+      return false;
+    }		
 	return true;
 }
 

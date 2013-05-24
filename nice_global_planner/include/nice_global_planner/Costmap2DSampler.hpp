@@ -19,7 +19,7 @@ namespace nice_global_planner{
 class Costmap2DSampler : public Sampler
 {
 public:
-	Costmap2DSampler(costmap_2d::Costmap2DROS *costmap_2d_ros);
+	Costmap2DSampler(costmap_2d::Costmap2DROS *costmap_2d_ros, double thresh = THRESHOLD);
 	~Costmap2DSampler(void);
 
 	geometry_msgs::Point samplePoint(const geometry_msgs::Pose& goal, const geometry_msgs::Pose& start);
@@ -47,6 +47,7 @@ private:
 
 	utils::RandomNumberGenerator rng;
 
+	double thresh;
 
 };
 
