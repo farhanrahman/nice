@@ -6,41 +6,41 @@ namespace nice_core
 NiceCore::NiceCore(
 		unsigned glbs,
 		unsigned gpbs,
-		unsigned gsbs,
 		unsigned gcbs,
+		unsigned rplbs,
 		unsigned rate
 ) : goalListenerBufferSize(glbs),
 	goalPublisherBufferSize(gpbs),
-	goalStatusListenerBufferSize(gsbs),
 	goalCancellerBufferSize(gcbs),
+	robotPositionListenerBufferSize(rplbs),
 	rate(rate)
 {
 	/*Initialise the subscribers and publishers*/
 	goalListener = nh.subscribe(
-						"move_base/goal", 
+						"move_base_simple/goal", 
 						goalListenerBufferSize, 
 						&NiceCore::GoalListenerCallback, 
 						this
 					);
 
-
-	coreGoalPublisher = nh.advertise<move_base_msgs::MoveBaseActionGoal>(
-						"move_base/refined_goal",
+	coreGoalPublisher = nh.advertise<geometry_msgs::PoseStamped>(
+						"move_base_simple/filtered_goal",
 						goalPublisherBufferSize
 					);
 
-	goalStatusListener = nh.subscribe(
-						"move_base/status",
-						goalStatusListenerBufferSize,
-						&NiceCore::GoalStatusListenerCallback,
-						this						
-					);
-
+	
 	goalCanceller = nh.advertise<actionlib_msgs::GoalID>(
 						"actionlib_msgs/GoalID",
 						goalCancellerBufferSize
 					);
 
+
+	robotPositionListener = nh.subscribe(
+						"move_base/feedback",
+						robotPositionListenerBufferSize,
+						&NiceCore::robotPositionListenerCallBack,
+						this
+					);
 
 	/*Initialise the clients*/
 	planService = nh.serviceClient<nav_msgs::GetPlan> ("make_plan");
@@ -49,11 +49,20 @@ NiceCore::NiceCore(
 
 }
 
+NiceCore::~NiceCore(void){
+}
+
 void NiceCore::nodeLoop(void){
-	while(ros::ok()){
-				
+	ros::Rate r((*this).rate);
+	ros::NodeHandle n;
+	while(n.ok()){
+		
+
+		ros::spinOnce();
+		r.sleep();
 	}
 }
+
 
 geometry_msgs::PoseStamped NiceCore::getGoal(void){
 	boost::mutex::scoped_lock(goalLock);
@@ -61,18 +70,41 @@ geometry_msgs::PoseStamped NiceCore::getGoal(void){
 	return ret;
 }
 
-void NiceCore::GoalListenerCallback(const move_base_msgs::MoveBaseActionGoal::ConstPtr& msg){
+void NiceCore::setGoal(const geometry_msgs::PoseStamped::ConstPtr& msg){
 	boost::mutex::scoped_lock(goalLock);
-	this->goal = (*msg).goal.target_pose;
+	this->goal = (*msg);
 }
 
-void NiceCore::GoalStatusListenerCallback(const actionlib_msgs::GoalStatusArray::ConstPtr& msg){
-	boost::mutex::scoped_lock(goalStatusLock);
-	unsigned size = (*msg).status_list.size();
-	for (unsigned i = 0; i < size; ++i){
-		(*this).goalInfos.push_back((*msg).status_list[i]);
-	}
+geometry_msgs::PoseStamped NiceCore::getRobotPosition(void){
+	boost::mutex::scoped_lock(feedbackLock);
+	geometry_msgs::PoseStamped ret = (*this).feedback.feedback.base_position;
+	return ret;
 }
+
+
+void NiceCore::sendGoal(const geometry_msgs::PoseStamped::ConstPtr& goal){
+	(*this).coreGoalPublisher.publish(*goal);
+}
+
+void NiceCore::sendGoal(const geometry_msgs::PoseStamped& goal){
+	(*this).coreGoalPublisher.publish(goal);
+}
+
+/*Callback functions*/
+void NiceCore::GoalListenerCallback(const geometry_msgs::PoseStamped::ConstPtr& msg){
+	/*Set the new goal*/
+	(*this).setGoal(msg);
+	/*Send plan to move_base to start off the base*/
+	(*this).sendGoal((*this).getGoal());
+	/*If planner thread is inactive then resume it*/
+
+}
+
+void NiceCore::robotPositionListenerCallBack(const move_base_msgs::MoveBaseActionFeedback::ConstPtr& msg){
+	boost::mutex::scoped_lock(feedbackLock);
+	this->feedback = (*msg);
+}
+
 
 	
 }

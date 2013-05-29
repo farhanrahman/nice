@@ -14,6 +14,7 @@
 
 	<!--Run Move base-->
 	<node pkg="move_base" type="move_base" respawn="false" name="move_base" output="screen">
+		<remap from="move_base_simple/goal" to="move_base_simple/filtered_goal"/>
 		<param name="base_local_planner" value="base_local_planner/TrajectoryPlannerROS" />
 		<!-- <param name="base_global_planner" value="navfn/NavfnROS"/> -->
 		<param name="base_global_planner" value="nice_global_planner/NiceGlobalPlannerROS"/>
@@ -25,6 +26,9 @@
 		<rosparam file="$(find robot_launch)/configs/base_local_planner_params.yaml" command="load" />
 		<rosparam file="$(find robot_launch)/configs/nice_global_planner_params.yaml" command="load" />
 	</node>
+
+	<!-- Run core module -->
+	<node pkg="nice_core" type="nice_core" name="nice_core"/>
 
 	<!-- Run Map Server -->
 	<node pkg="map_server" type="map_server" name="map_server" args="$(find robot_launch)/configs/miguel.yaml"/>

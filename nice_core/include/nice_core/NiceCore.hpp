@@ -6,13 +6,16 @@
 #include <actionlib_msgs/GoalStatusArray.h>
 
 #include <nav_msgs/GetPlan.h>
+
 #include <std_srvs/Empty.h>
 #include <std_srvs/Empty.h>
 
 #include <actionlib_msgs/GoalID.h>
 
 #include <geometry_msgs/PoseStamped.h>
+
 #include <boost/thread/mutex.hpp>
+#include <boost/thread.hpp>
 
 #include <vector>
 
@@ -25,11 +28,11 @@ public:
 	NiceCore(
 		unsigned glbs = 1000,
 		unsigned gpbs = 1000,
-		unsigned gsbs = 1000,
 		unsigned gcbs = 1000,
+		unsigned rplbs = 1000,
 		unsigned rate = 10
 	);
-	~NiceCore(){}
+	~NiceCore();
 
 	/**
 	 *@brief Main segment of the code that will get
@@ -44,15 +47,7 @@ private:
 	 *  move_base node.
 	 *@param msg Goal point being sent on the topic
 	 */
-	void GoalListenerCallback(const move_base_msgs::MoveBaseActionGoal::ConstPtr& msg);
-
-	/**
-	 *@brief Callback function for goal status
-	 *@param msg Message published from an external node
-	 * containing information about the status of previous
-	 * goals published
-	 */
-	void GoalStatusListenerCallback(const actionlib_msgs::GoalStatusArray::ConstPtr& msg);
+	void GoalListenerCallback(const geometry_msgs::PoseStamped::ConstPtr& msg);
 
 	/**
 	 * @brief Thread safe method to retrieve the last saved goal
@@ -60,11 +55,50 @@ private:
 	 */
 	geometry_msgs::PoseStamped getGoal(void);
 
+	/**
+	 * @brief Thread safe method to update the goal
+	 * @param g New goal position to be set
+	 */
+	void setGoal(const geometry_msgs::PoseStamped::ConstPtr& msg);
+	/**
+	 * @brief Updates the feedback about the position of the robot base
+	 *  by listening to the robot base information published on the feedback
+	 *  topic by move_base
+	 * @param msg Feedback message published by move_base
+	 */
+	void robotPositionListenerCallBack(const move_base_msgs::MoveBaseActionFeedback::ConstPtr& msg);
+
+
+	/**
+	 * @brief Function that sends a goal position to the move_base
+	 * @param goal New goal position to be sent to the move_base module
+	 */
+	void sendGoal(const geometry_msgs::PoseStamped::ConstPtr& goal);
+
+	/**
+	 * @brief Function that sends a goal position to the move_base
+	 * @param goal New goal position of type geometry_msgs::PoseStamped
+	 */
+	void sendGoal(const geometry_msgs::PoseStamped& goal);
+
+	/**
+	 * @brief Cancels a goal with a particular ID
+	 * @param goalID ID of the goal to cancel
+	 **/
+	void cancelGoal(const actionlib_msgs::GoalID goalId);
+
+	/**
+	 * @brief Returns the most upto date value of the robot's base
+	 *  as reported by the move_base module
+	 * @return The most upto date robot position
+	 */
+	geometry_msgs::PoseStamped getRobotPosition(void);
+
 	ros::Subscriber goalListener;
 	ros::Publisher coreGoalPublisher;
 	ros::Publisher goalCanceller;
 
-	ros::Subscriber goalStatusListener; 
+	ros::Subscriber robotPositionListener;
 
 	ros::ServiceClient planService;
 	ros::ServiceClient clearUnknownService;
@@ -75,14 +109,13 @@ private:
 	unsigned goalListenerBufferSize;
 	unsigned goalPublisherBufferSize;
 	unsigned goalCancellerBufferSize;
-	unsigned goalStatusListenerBufferSize;
+	unsigned robotPositionListenerBufferSize;
 	unsigned rate;
 
 	boost::mutex goalLock;
 	geometry_msgs::PoseStamped goal;
 
-	boost::mutex goalStatusLock;
-	std::vector<actionlib_msgs::GoalStatus> goalInfos;
+	move_base_msgs::MoveBaseActionFeedback feedback;
 
 };
 
