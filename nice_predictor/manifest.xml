@@ -1,0 +1,16 @@
+<package>
+  <description brief="nice_predictor">
+
+     nice_predictor
+
+  </description>
+  <author>Farhan</author>
+  <license>BSD</license>
+  <review status="unreviewed" notes=""/>
+  <url>http://ros.org/wiki/nice_predictor</url>
+  <depend package="roscpp"/>
+  <depend package="tf"/>
+
+</package>
+
+

@@ -52,11 +52,11 @@ NiceCore::NiceCore(
 NiceCore::~NiceCore(void){
 }
 
+
 void NiceCore::nodeLoop(void){
 	ros::Rate r((*this).rate);
 	ros::NodeHandle n;
 	while(n.ok()){
-		
 
 		ros::spinOnce();
 		r.sleep();
@@ -96,7 +96,6 @@ void NiceCore::GoalListenerCallback(const geometry_msgs::PoseStamped::ConstPtr& 
 	(*this).setGoal(msg);
 	/*Send plan to move_base to start off the base*/
 	(*this).sendGoal((*this).getGoal());
-	/*If planner thread is inactive then resume it*/
 
 }
 

@@ -1,0 +1,8 @@
+<launch>
+	<node pkg="nice_predictor" name="nice_predictor" type="nice_predictor"/>
+
+	<node pkg="openni_tracker" name="openni_tracker" type="openni_tracker"/>
+
+	<node pkg="rviz" name="rviz" type="rviz"/>
+
+</launch>

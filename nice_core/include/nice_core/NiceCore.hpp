@@ -117,6 +117,9 @@ private:
 
 	move_base_msgs::MoveBaseActionFeedback feedback;
 
+	bool newGoalPublished;
+	boost::mutex newGoalLock;
+
 };
 
 }
