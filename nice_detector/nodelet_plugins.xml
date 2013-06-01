@@ -1,0 +1,7 @@
+<library path="lib/libNiceDetector">
+  <class name="nice_detector/NiceDetector" type="nice_detector::NiceDetector" base_class_type="nodelet::Nodelet">
+  <description>
+  This is my nodelet.
+  </description>
+  </class>
+</library>
