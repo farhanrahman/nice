@@ -4,7 +4,9 @@
 int main(int argc, char * argv[]){
 	ros::init(argc, argv, "nice_core");
 
-	nice_core::NiceCore nc;
+	ros::NodeHandle n;
+
+	nice_core::NiceCore nc(n);
 
 	nc.nodeLoop();
 

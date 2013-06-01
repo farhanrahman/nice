@@ -19,13 +19,32 @@
 
 #include <vector>
 
+#include <tf/transform_broadcaster.h>
+#include <tf/transform_listener.h>
+#include <tf/tfMessage.h>
+#include <geometry_msgs/TransformStamped.h>
+
+#include <costmap_update/tfMessageParser.hpp>
+#include <costmap_update/ParserMessage.hpp>
+
+#include <nice_detector/Detection.h>
+
+#include <queue>
+
 namespace nice_core
 {
+
+typedef enum CoreMode{
+	IDLE = 0,
+	FOLLOWING = 1,
+	PLANNING = 2
+} CoreMode;
 
 class NiceCore
 {
 public:
 	NiceCore(
+		ros::NodeHandle& n,
 		unsigned glbs = 1000,
 		unsigned gpbs = 1000,
 		unsigned gcbs = 1000,
@@ -94,6 +113,55 @@ private:
 	 */
 	geometry_msgs::PoseStamped getRobotPosition(void);
 
+
+	/**
+	 * @brief Callback function for tf messages published on the
+	 *  openni_tracker topic
+	 * @param msg An array of TransformStamped messages
+	 **/
+	void tfCallback(const tf::tfMessage::ConstPtr& msg);
+
+	/**
+	 * @brief Thread safe getter function
+	 * @return Returns a copy of the Core Mode
+	 **/
+	CoreMode getCoreMode(void);
+
+	/**
+	 * @brief Thread safe method to update the core module mode
+	 * @param c New mode to be set
+	 **/
+	void setCoreMode(CoreMode c);
+
+	/**
+	 * @brief Thread safe method to update the following agent number
+	 * @param fa The agent number to be set that the base_link should follow
+	 **/
+	void setFollowingAgent(int fa);	
+
+	/**
+	 * @brief Calculates the squared distance in the Euclidian space
+	 * @return Returns the squared Euclidian distance
+	 */
+	double getDistanceSq(const geometry_msgs::Transform& transform);
+
+	/**
+	 * @brief Checks whether a particular agent is facing the goal
+	 * @param transform Transform of the agent
+	 * @return True if the agent with transform is facing the goal
+	 */
+	bool facingGoal(const geometry_msgs::Transform& transform);
+
+
+	/**
+	 * @brief Method for retreiving the following agent number
+	 * @return Returns the following agent number in a thread safe method
+	 **/
+	int getFollowingAgent(void);
+
+	/**/
+	void detectionCallback(const nice_core::DetectionListConstPtr& detects);
+
 	ros::Subscriber goalListener;
 	ros::Publisher coreGoalPublisher;
 	ros::Publisher goalCanceller;
@@ -104,7 +172,7 @@ private:
 	ros::ServiceClient clearUnknownService;
 	ros::ServiceClient clearCostmapService;
 
-	ros::NodeHandle nh;
+	ros::NodeHandle* nhPtr;
 
 	unsigned goalListenerBufferSize;
 	unsigned goalPublisherBufferSize;
@@ -120,6 +188,21 @@ private:
 	bool newGoalPublished;
 	boost::mutex newGoalLock;
 
+	ros::Subscriber tfListener;
+
+	boost::mutex cmMutex;
+	CoreMode coreMode;
+
+	tf::TransformListener tfl;
+
+	int followingAgent;
+
+	ros::Publisher pub;
+
+	ros::Subscriber detection;
+
+	boost::mutex dqMutex;
+	std::queue<geometry_msgs::PointStamped> detectionQueue;
 };
 
 }
