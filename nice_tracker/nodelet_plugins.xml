@@ -1,0 +1,7 @@
+<library path="lib/libNiceTracker">
+  <class name="nice_tracker/NiceTracker" type="nice_tracker::NiceTracker" base_class_type="nodelet::Nodelet">
+  <description>
+  Tracker nodelet.
+  </description>
+  </class>
+</library>
