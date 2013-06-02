@@ -25,6 +25,8 @@ namespace nice_tracker{
 
 			detectionListener = nh->subscribe("detections", 1000, &NiceTracker::start_tracking, this);
 
+			kalmanPointPublisher = nh->advertise<move_base_msgs::MoveBaseGoal>("kalman_points", 10);
+
 			ac = new MoveBaseClient("move_base", true);
 
 			running = true;
@@ -214,10 +216,11 @@ namespace nice_tracker{
 					  	goal.target_pose.header.stamp = ros::Time::now();
 					  	goal.target_pose.pose.position.x = x;
 					  	goal.target_pose.pose.position.y = y;				
-						
 
-					  	ROS_INFO("Sending goal");						
-					  	ac->sendGoal(goal);					
+						kalmanPointPublisher.publish(goal);						
+
+					  	// ROS_INFO("Sending goal");						
+					  	// ac->sendGoal(goal);					
 					  	//ac->waitForResult();				
 					}
 				}

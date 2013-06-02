@@ -48,9 +48,7 @@
 		<rosparam file="$(find robot_launch)/configs/nice_global_planner_params.yaml" command="load" />
 	</node>
 
-	<!-- Run core module -->
-	<!-- <node pkg="nice_core" type="nice_core" name="nice_core"/>	 -->
-<include file="$(find openni_launch)/launch/openni.launch" />
+	<include file="$(find openni_launch)/launch/openni.launch" />
 	<node pkg="nodelet" type="nodelet" name="standalone_nodelet"  args="manager" output="screen"/>
 	<node pkg="nodelet" type="nodelet" name="NiceDetector" args="load nice_detector/NiceDetector standalone_nodelet" output="screen">
 			<param name = "downsample_leaf_size" type="double" value = "0.06" />
@@ -72,8 +70,12 @@
 	</node>
 
 <node pkg="nodelet" type="nodelet" name="NiceTracker" args="load nice_tracker/NiceTracker standalone_nodelet" output="screen" />
+	<!-- Run core module -->
+	<node pkg="nice_core" type="nice_core" name="nice_core"/>
 
 	<!--Launch rviz-->
-	<node pkg="rviz" type="rviz" name="rviz" args="-d $(find robot_launch)/rviz/navigation.vcg"/>
+	<node pkg="rviz" type="rviz" name="rviz" args="-d $(find robot_launch)/rviz/navigation.vcg">
+		<remap from="move_base_simple/goal" to="nice_core/main_goal"/>
+	</node>
 
 </launch>

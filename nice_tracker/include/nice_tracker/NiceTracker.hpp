@@ -54,6 +54,8 @@ namespace nice_tracker{
 
 			ros::Subscriber detectionListener;
 
+			ros::Publisher kalmanPointPublisher;
+
 			message_filters::Subscriber<nice_detector::DetectionList> detect;
 			message_filters::Subscriber<nav_msgs::Odometry> odom;			
 			boost::shared_ptr<Synchronizer> sync;

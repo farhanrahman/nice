@@ -11,13 +11,17 @@
 #include <boost/thread/mutex.hpp>
 #include <actionlib/action_definition.h>
 
+#include <queue>
+
+#include <limits>
+
 namespace nice_core
 {
 
 typedef enum CoreMode{
 	IDLE = 0,
 	PLANNING = 1,
-	FOLLOWING
+	FOLLOWING = 2
 } CoreMode;
 
 class NiceCore
@@ -27,7 +31,7 @@ public:
 		ros::NodeHandle& n,
 		double rate = 10
 	);
-	~NiceCore(){}
+	~NiceCore();
 
 	void nodeLoop(void);
 
@@ -45,10 +49,32 @@ private:
 	typedef actionlib::SimpleActionClient<move_base_msgs::MoveBaseAction> MoveBaseClient;
 	MoveBaseClient* ac;
 	void doneCallback(const actionlib::SimpleClientGoalState& state, const move_base_msgs::MoveBaseResultConstPtr& result);
+	boost::function<void (const actionlib::SimpleClientGoalState&, const move_base_msgs::MoveBaseResultConstPtr&) > f;
+	void feedbackCallback(const move_base_msgs::MoveBaseFeedbackConstPtr& feedback);
+	boost::function<void (const move_base_msgs::MoveBaseFeedbackConstPtr& feedback) > f2;
+
+	void updateBasePosition(const geometry_msgs::PoseStamped& base_position){
+		boost::mutex::scoped_lock(baseUpdateMutex);
+		this->base_position = base_position;
+	}
+
+	geometry_msgs::PoseStamped getBasePosition(void){
+		boost::mutex::scoped_lock(baseUpdateMutex);
+		geometry_msgs::PoseStamped ret = this->base_position;
+		return ret;		
+	}
+
+	boost::mutex baseUpdateMutex;
+	geometry_msgs::PoseStamped base_position;
 
 	boost::mutex mainGoalMutex;
 	move_base_msgs::MoveBaseGoal mainGoal;
 	ros::Subscriber mainGoalListener;
+
+	ros::Subscriber kalmanListener;
+	void kalmanCallback(const move_base_msgs::MoveBaseGoal::ConstPtr& msg);
+	boost::mutex kalmanMutex;
+	std::queue<move_base_msgs::MoveBaseGoal> kalmanPointQueue;
 
 
 	boost::mutex cmMutex;

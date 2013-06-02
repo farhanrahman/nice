@@ -19,6 +19,20 @@ NiceCore::NiceCore(
 				);
 
 	coreMode = IDLE;
+
+	kalmanListener = n.subscribe(
+				"kalman_points",
+				100,
+				&NiceCore::kalmanCallback,
+				this
+			);
+
+	f = boost::bind(&NiceCore::doneCallback, this, _1, _2);
+	f2 = boost::bind(&NiceCore::feedbackCallback, this, _1);
+}
+
+NiceCore::~NiceCore(void){
+	delete ac;
 }	
 	
 void NiceCore::setMainGoal(const geometry_msgs::PoseStamped& poseStamped){
@@ -45,23 +59,36 @@ move_base_msgs::MoveBaseGoal NiceCore::getMainGoal(void){
 
 void NiceCore::doneCallback(const actionlib::SimpleClientGoalState& state, const move_base_msgs::MoveBaseResultConstPtr& result)
 {
-	ROS_INFO("DONE");
-	this->setCoreMode(IDLE);
+	std::string stateStr = state.toString();
+	if( (stateStr == "SUCCEEDED") || (stateStr == "REJECTED") || (stateStr == "ABORTED") ){
+		CoreMode cmCopy = this->getCoreMode();
+		if(cmCopy == FOLLOWING){
+			this->setCoreMode(PLANNING);
+			ROS_INFO("Sending main goal after resuing PLANNING");
+			ac->sendGoal(this->getMainGoal(), f);
+		} else {
+			ROS_INFO("DONE");
+			this->setCoreMode(IDLE);
+		}
+	}
+}
+
+void NiceCore::feedbackCallback(const move_base_msgs::MoveBaseFeedbackConstPtr& feedback){
+	this->updateBasePosition(feedback->base_position);
 }
 
 void NiceCore::mainGoalListenerCallback(const geometry_msgs::PoseStamped::ConstPtr& msg){
 	this->setMainGoal(*msg);
 	this->setCoreMode(PLANNING);
 
-	ROS_INFO("Sending goal");
-	boost::function<void (const actionlib::SimpleClientGoalState&, const move_base_msgs::MoveBaseResultConstPtr&) > f;
-
-	f = boost::bind(&NiceCore::doneCallback, this, _1, _2);
+	ROS_INFO("Sending main goal");
 
 	ac->sendGoal(this->getMainGoal(), f);
+}
 
-	// ac->waitForResult();
-	// this->setCoreMode(IDLE);
+void NiceCore::kalmanCallback(const move_base_msgs::MoveBaseGoal::ConstPtr& msg){
+	boost::mutex::scoped_lock(kalmanMutex);
+	(*this).kalmanPointQueue.push(*msg);
 }
 
 
@@ -69,6 +96,55 @@ void NiceCore::nodeLoop(void){
 	ros::Rate r(this->rate);
 
 	while(ros::ok()){
+
+		CoreMode cmCopy = this->getCoreMode();
+		if(cmCopy != IDLE){
+			std::queue<move_base_msgs::MoveBaseGoal> qCopy;
+			{
+				boost::mutex::scoped_lock(kalmanMutex);
+				for(unsigned i = 0; i < kalmanPointQueue.size(); ++i){
+					qCopy.push(kalmanPointQueue.front());
+					kalmanPointQueue.pop();
+				}
+			}
+
+			if(qCopy.size() != 0){
+				/*#TODO for now just get the latest point.
+				 * Later will analyse points with goal point
+				 * to see whether the person is coming towards
+				 * or going away*/
+				double minDistanceSq = std::numeric_limits<double>::max();
+				double distanceSqToGoal = 0.0;
+				geometry_msgs::PoseStamped bp = this->getBasePosition();
+				move_base_msgs::MoveBaseGoal goalCopy = this->getMainGoal();
+				double dx = bp.pose.position.x - goalCopy.target_pose.pose.position.x;
+				double dy = bp.pose.position.y - goalCopy.target_pose.pose.position.y;
+				distanceSqToGoal = dx*dx + dy*dy;
+				bool personFound = false;
+				move_base_msgs::MoveBaseGoal personToFollow;
+
+				for(unsigned i = 0; i < qCopy.size(); ++i){
+					double personDistanceSqToGoal = 0.0;
+					move_base_msgs::MoveBaseGoal person = qCopy.front();
+					qCopy.pop();
+					double pdx = goalCopy.target_pose.pose.position.x - person.target_pose.pose.position.x;
+					double pdy = goalCopy.target_pose.pose.position.y - person.target_pose.pose.position.y;
+					personDistanceSqToGoal = pdx*pdx + pdy*pdy;
+					if(personDistanceSqToGoal < distanceSqToGoal){
+						if(personDistanceSqToGoal < minDistanceSq){
+							personFound = true;
+							personToFollow = person;
+						}
+					}
+				}
+
+				if(personFound){
+					this->setCoreMode(FOLLOWING);
+					ROS_INFO("Sending human sub goal");
+					ac->sendGoal(personToFollow, f);
+				}
+			}
+		}
 
 		ros::spinOnce();
 		r.sleep();
