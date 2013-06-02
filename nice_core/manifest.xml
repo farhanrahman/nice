@@ -16,6 +16,7 @@
   <depend package="std_srvs"/>
   <depend package="actionlib_msgs"/>
   <depend package="tf"/>
+  <depend package="nice_detector"/>
 
 </package>
 
