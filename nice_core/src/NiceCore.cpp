@@ -31,30 +31,30 @@ NiceCore::NiceCore(
 					);
 
 	detection = nh.subscribe(
-						"detections"
+						"detections",
 						1,
 						&NiceCore::detectionCallback,
 						this
 					);
 
-	// coreGoalPublisher = nh.advertise<geometry_msgs::PoseStamped>(
-	// 					"move_base_simple/filtered_goal",
-	// 					goalPublisherBufferSize
-	// 				);
+	coreGoalPublisher = nh.advertise<geometry_msgs::PoseStamped>(
+						"move_base_simple/filtered_goal",
+						goalPublisherBufferSize
+					);
 
 	
-	// goalCanceller = nh.advertise<actionlib_msgs::GoalID>(
-	// 					"actionlib_msgs/GoalID",
-	// 					goalCancellerBufferSize
-	// 				);
+	goalCanceller = nh.advertise<actionlib_msgs::GoalID>(
+						"actionlib_msgs/GoalID",
+						goalCancellerBufferSize
+					);
 
 
-	// robotPositionListener = nh.subscribe(
-	// 					"move_base/feedback",
-	// 					robotPositionListenerBufferSize,
-	// 					&NiceCore::robotPositionListenerCallBack,
-	// 					this
-	// 				);
+	robotPositionListener = nh.subscribe(
+						"move_base/feedback",
+						robotPositionListenerBufferSize,
+						&NiceCore::robotPositionListenerCallBack,
+						this
+					);
 
 	// tfListener = nh.subscribe(
 	// 					"tf",
@@ -63,10 +63,10 @@ NiceCore::NiceCore(
 	// 					this
 	// 				);
 
-	// pub = nh.advertise<geometry_msgs::Twist>(
- //                		"cmd_vel",
- //                		10
- //                	);
+	pub = nh.advertise<geometry_msgs::Twist>(
+                		"cmd_vel",
+                		10
+                	);
 
 	/*Initialise the clients*/
 	planService = nh.serviceClient<nav_msgs::GetPlan> ("make_plan");
@@ -99,44 +99,93 @@ void NiceCore::nodeLoop(void){
     // Maximum time for transform to be available
     const double timeout = 0.1;
 
-    const std::string destFrame = "base_link";
-
+    const std::string destFrame = "/base_link";
+	// const std::string destFrame = "/camera_depth_frame";
+	const std::string originFrame = "/odom";
 	while(n.ok()){
 
 		CoreMode cmCopy = this->getCoreMode();
+		DetectionMessage latest;
+		DetectionMessage oldest;		
+
+		if(coreMode != IDLE){
+			std::queue<DetectionMessage> dqCopy;
+			{
+				boost::mutex::scoped_lock(dqMutex);
+				for(unsigned i = 0; i < detectionQueue.size(); ++i){
+					DetectionMessage dmsg = detectionQueue.front();
+					dqCopy.push(dmsg);
+					detectionQueue.pop();
+				}
+			}
+
+			if(dqCopy.size() == 0){
+				// ROS_INFO("dqCopy size is 0. Cannot continue");
+				this->setCoreMode(PLANNING);
+				if(cmCopy == FOLLOWING){
+					this->sendGoal((*this).getGoal());
+					cmCopy = PLANNING;
+				}
+			} else {
+				latest = dqCopy.back();
+				oldest = dqCopy.front();			
+				double dt = latest.distance - oldest.distance;
+
+				// if(dt >= 0.0){
+					this->setCoreMode(FOLLOWING);
+					geometry_msgs::PoseStamped goalCopy = this->getGoal();
+					actionlib_msgs::GoalID goalId;
+					goalId.stamp = goalCopy.header.stamp;
+					goalId.id = goalCopy.header.frame_id;
+					this->cancelGoal(goalId);
+				// }
+				// else {
+				// 	this->setCoreMode(PLANNING);
+				// 	if(cmCopy == FOLLOWING){
+				// 		this->sendGoal((*this).getGoal());
+				// 		cmCopy = PLANNING;
+				// 	}
+				// }
+			}
+		}
+
+
 
 		if (cmCopy == FOLLOWING){
 			ROS_INFO("FOLLOWING");
-			std::stringstream ss;
-			std::string originFrame;
-			int fa = this->getFollowingAgent();
-			ss << "torso_" << fa << std::endl;
-			ss >> originFrame;
+			// std::stringstream ss;
+			// ss << "torso" << std::endl;
+			// ss >> originFrame;
 
-	        bool okay = tfl.waitForTransform(
-	                    destFrame,
-	                    originFrame,
-	                    ros::Time::now() - ros::Duration(timeout), //Need recent tf
-	                    ros::Duration(timeout)
-	                    );
+	        // bool okay = tfl.waitForTransform(
+	        //             destFrame,
+	        //             originFrame,
+	        //             ros::Time::now() - ros::Duration(timeout), //Need recent tf
+	        //             ros::Duration(timeout)
+	        //             );
 
 	        double linearSpeed = 0.0;
         	double angularSpeed = 0.0;
 
-	        if(okay){
+	        // if(okay){
 	            geometry_msgs::PointStamped input;
 	            input.header.frame_id = originFrame;
 	            input.header.stamp = ros::Time(0);
 
-	            input.point.x = 0.0;
-	            input.point.y = 0.0;
-	            input.point.z = 0.0;
+				geometry_msgs::PointStamped pointToFollow = latest.point;
+
+	            input.point.x = pointToFollow.point.x;
+	            input.point.y = pointToFollow.point.y;
+	            input.point.z = pointToFollow.point.z;
 
 	            geometry_msgs::PointStamped output;
 
 	            // TODO: Do you understand what this function is doing?
 	            tfl.transformPoint( destFrame, input, output );
 
+	            output.point.x = pointToFollow.point.x;
+	            output.point.y = pointToFollow.point.y;
+	            output.point.z = pointToFollow.point.z;
 
 	            // README: Now we use the transformed point to calculate the
 	            // required translational and rotational speeds.
@@ -177,11 +226,12 @@ void NiceCore::nodeLoop(void){
 	                    linearSpeed = maxLinearSpeed;
 
 	            }	        	
-	        } else {
-				this->setCoreMode(PLANNING);
-				this->sendGoal((*this).getGoal());
-				this->setFollowingAgent(-1);
-	        }
+	        // } 
+	   //      else {
+				// this->setCoreMode(PLANNING);
+				// this->sendGoal((*this).getGoal());
+				// this->setFollowingAgent(-1);
+	   //       }
 		}
 
 		ros::spinOnce();
@@ -246,7 +296,7 @@ void NiceCore::GoalListenerCallback(const geometry_msgs::PoseStamped::ConstPtr& 
 
 	if(cmCopy == PLANNING){
 		/*Send plan to move_base to start off the base*/
-		(*this).sendGoal((*this).getGoal());
+		// (*this).sendGoal((*this).getGoal());
 	}
 
 }
@@ -342,8 +392,47 @@ void NiceCore::tfCallback(const tf::tfMessage::ConstPtr& msg){
 	}
 }
 
-void detectionCallback(const nice_core::DetectionListConstPtr& detects){
-	
+geometry_msgs::PointStamped NiceCore::getWorldPoint(geometry_msgs::PointStampedPtr& p, const char *frame){
+	geometry_msgs::PointStamped result;
+	try{
+		tfl.waitForTransform(p->header.frame_id, frame, p->header.stamp, ros::Duration(5.0));
+  		tfl.transformPoint(frame, *p, result);
+	}
+		catch (tf::TransformException &ex)
+	{
+ 		ROS_ERROR("%s",ex.what());
+  		return geometry_msgs::PointStamped();
+	}
+	return result;
+}
+
+void NiceCore::detectionCallback(const nice_detector::DetectionListConstPtr& detections){
+	boost::mutex::scoped_lock(dqMutex);
+	for(unsigned i = 0; i < (*detections).detections.size(); ++i){
+
+		geometry_msgs::PointStampedPtr p (new geometry_msgs::PointStamped);
+		geometry_msgs::PointStampedPtr worldPoint (new geometry_msgs::PointStamped);
+		p->header.frame_id = detections->header.frame_id;
+		p->header.stamp = detections->header.stamp;				     
+		p->point.x = detections->detections[i].centroid.x;
+		p->point.y = detections->detections[i].centroid.y;
+		p->point.z = detections->detections[i].centroid.z;
+		
+		*worldPoint = getWorldPoint(p, "/odom");		
+		// *worldPoint = getWorldPoint(p, "/camera_depth_frame");		
+
+		DetectionMessage detectionMsg(
+			(*detections).detections.at(i).centroid,  
+			(*detections).detections.at(i).height,
+			(*detections).detections.at(i).confidence,
+			(*detections).detections.at(i).distance,
+			(*detections).detections.at(i).occluded,
+			(*detections).detections.at(i).header,
+			*worldPoint
+		);
+
+		this->detectionQueue.push(detectionMsg);
+	}
 }
 
 	

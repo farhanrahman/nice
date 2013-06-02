@@ -28,8 +28,12 @@
 #include <costmap_update/ParserMessage.hpp>
 
 #include <nice_detector/Detection.h>
+#include <nice_detector/DetectionList.h>
 
 #include <queue>
+#include <nice_core/DetectionMessage.hpp>
+
+#include <boost/shared_ptr.hpp>
 
 namespace nice_core
 {
@@ -39,6 +43,8 @@ typedef enum CoreMode{
 	FOLLOWING = 1,
 	PLANNING = 2
 } CoreMode;
+
+typedef boost::shared_ptr<DetectionMessage> DetectionMsgPtr;
 
 class NiceCore
 {
@@ -160,7 +166,11 @@ private:
 	int getFollowingAgent(void);
 
 	/**/
-	void detectionCallback(const nice_core::DetectionListConstPtr& detects);
+	void detectionCallback(const nice_detector::DetectionListConstPtr& detections);
+
+
+	geometry_msgs::PointStamped getWorldPoint(geometry_msgs::PointStampedPtr& p, const char *frame);
+
 
 	ros::Subscriber goalListener;
 	ros::Publisher coreGoalPublisher;
@@ -202,7 +212,8 @@ private:
 	ros::Subscriber detection;
 
 	boost::mutex dqMutex;
-	std::queue<geometry_msgs::PointStamped> detectionQueue;
+	std::queue<DetectionMessage> detectionQueue;
+
 };
 
 }

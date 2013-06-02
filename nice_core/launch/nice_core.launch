@@ -1,0 +1,3 @@
+<launch>
+	<node pkg="nice_core" type="nice_core" name="nice_core"/>
+</launch>

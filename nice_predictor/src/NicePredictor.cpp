@@ -140,34 +140,42 @@ void NicePredictor::trackerCallback(const tf::tfMessage::ConstPtr& msg){
 		tfparser::message m = tfMessageParser::parseFrame((std::string) (*msg).transforms.at(i).child_frame_id);
 		if ((m.part == "/torso") && (m.user == 1)){
 			try{
-				ros::Time past = (*msg).transforms.at(i).header.stamp - ros::Duration(2.0);
+				ros::Time past = ros::Time::now() - ros::Duration(2.0);
 		        
 				tf::StampedTransform transform;
 
-				tfl.lookupTransform(
-							"torso_1", 
-							"openni_depth_frame", 
-							past, 
-							transform
-						);
+				bool okay = tfl.waitForTransform(
+								"torso_1", 
+								"openni_depth_frame", 
+								ros::Time::now() - ros::Duration(2.0), 
+								ros::Duration(0.1)
+							);
+				if (okay){
+					tfl.lookupTransform(
+								"torso_1", 
+								"openni_depth_frame", 
+								past, 
+								transform
+							);
 
-				{
-					boost::mutex::scoped_lock(tfMutex);
-					tfQueue.push((*msg).transforms.at(i));
+					{
+						boost::mutex::scoped_lock(tfMutex);
+						tfQueue.push((*msg).transforms.at(i));
+					}
+
+					OTL::VectorXd xtm2(3);
+					xtm2(0) = transform.getOrigin().x();
+					xtm2(1) = transform.getOrigin().y();
+					xtm2(2) = transform.getOrigin().z();
+
+					OTL::VectorXd xt(3);
+					xt(0) = (*msg).transforms.at(i).transform.translation.x;
+					xt(1) = (*msg).transforms.at(i).transform.translation.y;
+					xt(2) = (*msg).transforms.at(i).transform.translation.z;
+					
+					mt.update(xtm2);
+					mt.train(xt);
 				}
-
-				OTL::VectorXd xtm2(3);
-				xtm2(0) = transform.getOrigin().x();
-				xtm2(1) = transform.getOrigin().y();
-				xtm2(2) = transform.getOrigin().z();
-
-				OTL::VectorXd xt(3);
-				xt(0) = (*msg).transforms.at(i).transform.translation.x;
-				xt(1) = (*msg).transforms.at(i).transform.translation.y;
-				xt(2) = (*msg).transforms.at(i).transform.translation.z;
-				
-				mt.update(xtm2);
-				mt.train(xt);
 
 			} catch(tf::TransformException ex){
 				ROS_ERROR("%s",ex.what());

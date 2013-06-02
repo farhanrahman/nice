@@ -36,6 +36,10 @@ Grid.OffsetZ=0
 Grid.Plane=0
 Grid.Plane\ Cell\ Count=100
 Grid.Reference\ Frame=/odom
+Image.Enabled=1
+Image.Image\ Topic=/blobs
+Image.Queue\ Size=2
+Image.Transport\ Hint=raw
 Inflated\ Obstacles.Alpha=1
 Inflated\ Obstacles.ColorB=0.984314
 Inflated\ Obstacles.ColorG=0.780392
@@ -70,9 +74,9 @@ Planner\ Plan.ColorG=0
 Planner\ Plan.ColorR=1
 Planner\ Plan.Enabled=1
 Planner\ Plan.Topic=/move_base/NavfnROS/plan
-Property\ Grid\ Splitter=627,78
-Property\ Grid\ State=expanded=.Global Options,Obstacles.Enabled,Inflated Obstacles.Enabled,Robot Footprint.Enabled,Global Plan.Enabled,Planner Plan.Enabled,Local Plan.Enabled,Current Goal.Enabled,TF.Enabled,Map.Enabled;splitterratio=0.5
-QMainWindow=000000ff00000000fd00000003000000000000011d00000313fc0200000001fb000000100044006900730070006c006100790073010000001d00000313000000ee00ffffff000000010000013100000313fc0200000003fb0000001e0054006f006f006c002000500072006f0070006500720074006900650073010000001d000000c90000006700fffffffb0000000a0056006900650077007301000000ec00000175000000bb00fffffffb0000001200530065006c0065006300740069006f006e0100000267000000c90000006700ffffff00000003000004ef0000003efc0100000001fb0000000800540069006d00650100000000000004ef000002bf00ffffff000002950000031300000004000000040000000800000008fc0000000100000002000000010000000a0054006f006f006c00730100000000ffffffff0000000000000000
+Property\ Grid\ Splitter=245,78
+Property\ Grid\ State=expanded=.Global Options,Obstacles.Enabled,Inflated Obstacles.Enabled,Robot Footprint.Enabled,Global Plan.Enabled,Planner Plan.Enabled,Local Plan.Enabled,Current Goal.Enabled,TF.Enabled,Map.Enabled,Image.Enabled;splitterratio=0.5
+QMainWindow=000000ff00000000fd00000004000000000000011d00000195fc0200000001fb000000100044006900730070006c006100790073010000012f00000195000000ee00ffffff000000010000013100000195fc0200000003fb0000001e0054006f006f006c002000500072006f0070006500720074006900650073010000012f000000670000006700fffffffb0000000a00560069006500770073010000019c000000bb000000bb00fffffffb0000001200530065006c0065006300740069006f006e010000025d000000670000006700ffffff00000002000004bf0000010cfc0100000001fb0000000a0049006d0061006700650100000000000004bf0000004f00ffffff00000003000004bf0000003efc0100000001fb0000000800540069006d00650100000000000004bf000002bf00ffffff000002650000019500000004000000040000000800000008fc0000000100000002000000010000000a0054006f006f006c00730100000000ffffffff0000000000000000
 Robot\ Footprint.Alpha=1
 Robot\ Footprint.ColorB=0.984314
 Robot\ Footprint.ColorG=0.0627451
@@ -106,6 +110,9 @@ Name=TF
 [Display11]
 ClassName=rviz::MapDisplay
 Name=Map
+[Display12]
+ClassName=rviz::ImageDisplay
+Name=Image
 [Display2]
 ClassName=rviz::PoseArrayDisplay
 Name=Particle Cloud
@@ -131,13 +138,18 @@ Name=Local Plan
 ClassName=rviz::PoseDisplay
 Name=Current Goal
 [TF.Frames.]
-base_footprint.Enabled=1
 base_laser_link.Enabled=1
 base_link.Enabled=1
+camera_depth_frame.Enabled=1
+camera_depth_optical_frame.Enabled=1
+camera_link.Enabled=1
+camera_rgb_frame.Enabled=1
+camera_rgb_optical_frame.Enabled=1
 map.Enabled=1
 odom.Enabled=1
+openni_depth_frame.Enabled=1
 [Window]
-Height=920
-Width=1279
+Height=776
+Width=1215
 X=148
 Y=-368

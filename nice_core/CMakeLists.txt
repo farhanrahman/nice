@@ -30,5 +30,6 @@ set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/lib)
 #target_link_libraries(example ${PROJECT_NAME})
 
 include_directories($ENV{ROS_WORKSPACE}/nice/costmap_update/include)
+include_directories($ENV{ROS_WORKSPACE}/nice/nice_detector/include)
 
 rosbuild_add_executable(${PROJECT_NAME} src/main.cpp src/NiceCore.cpp)

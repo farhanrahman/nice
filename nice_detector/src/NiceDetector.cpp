@@ -185,10 +185,10 @@ void NiceDetector::publish_rgb_blobs(list<Cluster>* clusters, const sensor_msgs:
 				
 				if(initialized_boosting == false){
 					//Init Adaboost strong classifier
-					std::cout << "Init adaboost "<< std::endl;
+					// std::cout << "Init adaboost "<< std::endl;
 					nice_detector::Size patchSize;
 					patchSize = best->getROIofBlob();
-					std::cout << "Dobimo ROI detekcije"<< std::endl;
+					// std::cout << "Dobimo ROI detekcije"<< std::endl;
 					classifier = new StrongClassifierDirectSelection(numBaseClassifier, numWeakClassifier, patchSize, useFeatureExchange, iterationInit);
 				
 					detector = new BoostingDetector (classifier);
@@ -196,10 +196,10 @@ void NiceDetector::publish_rgb_blobs(list<Cluster>* clusters, const sensor_msgs:
 					nice_detector::Rect trackingROI = best->getTrackingROI(ADABOOST_SEARCH_AREA, validROI);			
 					nice_detector::Size trackedPatchSize;
 					trackedPatchSize = trackedPatch;		
-					std::cout << "1 " << std::endl;		
+					// std::cout << "1 " << std::endl;		
 					Patches *trackingPatches = new PatchesRegularScan(trackingROI, validROI, trackedPatchSize, 0.99f);
 					//to GrayScale
-					std::cout << "2" << std::endl;	
+					// std::cout << "2" << std::endl;	
 					cv::Mat im_rgb = (best->getCamImg())->image;
 					cv::Mat im_gray;
 					cv::cvtColor(im_rgb,im_gray,CV_RGB2GRAY);
@@ -210,7 +210,7 @@ void NiceDetector::publish_rgb_blobs(list<Cluster>* clusters, const sensor_msgs:
 					//std::cout << "Init ADABOOST " << std::endl;
 					for (int curInitStep = 0; curInitStep < iterationInit; curInitStep++)
 					{
-						printf ("\rinit tracker... %3.0f %% ", ((float)curInitStep)/(iterationInit-1)*100);	
+						// printf ("\rinit tracker... %3.0f %% ", ((float)curInitStep)/(iterationInit-1)*100);	
 						classifier->update (wholeImage, trackingPatches->getSpecialRect ("UpperLeft"), -1);
 						classifier->update (wholeImage, trackedPatch, 1);
 						classifier->update (wholeImage, trackingPatches->getSpecialRect ("UpperRight"), -1);
@@ -240,32 +240,32 @@ void NiceDetector::publish_rgb_blobs(list<Cluster>* clusters, const sensor_msgs:
 	/* When the human is detected we classify each found cluster with Online Adaboost */
 	else 
 	{
-		std::cout << "prepoznava" << std::endl;
+		// std::cout << "prepoznava" << std::endl;
 		if(!(clusters->empty()))
 		{
-			std::cout << "not" << std::endl;
+			// std::cout << "not" << std::endl;
 			int max_size = 0;
 			float best_conf = -100.0f;
 			float confidence = -100.0f;
 			nice_detector::Rect best_trackedPatch;
 
 			list<Cluster>::iterator largest;
-			std::cout << "OK: 1" << std::endl;	
+			// std::cout << "OK: 1" << std::endl;	
 			bool start_img = true;
 							
 			cv::Mat im_gray;
-			std::cout << "OK: 4" << std::endl;	
+			// std::cout << "OK: 4" << std::endl;	
 			cv_bridge::CvImagePtr ib = cv_bridge::toCvCopy(image, image->encoding);
 			cv::Mat im_rgb = ib->image;
 			cv::cvtColor(im_rgb,im_gray,CV_RGB2GRAY);
 			unsigned char *pixels = im_gray.data; 
 			wholeImage = new ImageRepresentation(pixels, img_size); 			
-			std::cout << "OK: 5" << std::endl;	
+			// std::cout << "OK: 5" << std::endl;	
 			for(it = clusters->begin(); it != clusters->end(); it++ ) 
 			{					
-				std::cout << "OK: clusters" << std::endl;	
+				// std::cout << "OK: clusters" << std::endl;	
 				it->produceRGBBlob(cam_info, image);
-				std::cout << "OK: 3" << std::endl;	
+				// std::cout << "OK: 3" << std::endl;	
 				
 				//OPTIMIZACIJA: zajememo čb sliko le prvič, saj je pri vseh clustrih enaka.
 				trackedPatch = it->getROIofBlob();
@@ -274,10 +274,10 @@ void NiceDetector::publish_rgb_blobs(list<Cluster>* clusters, const sensor_msgs:
 				trackedPatchSize = trackedPatch;
 				Patches* patches = new PatchesRegularScan(trackedPatch, validROI, trackedPatchSize, 0.99f);
 				detector->classifySmooth (wholeImage, patches);
-				std::cout << "Detekcija OK" << std::endl;	
+				// std::cout << "Detekcija OK" << std::endl;	
 				confidence  = detector->getConfidenceOfBestDetection ();
-				std::cout << "Vzami confidence" << std::endl;	
-				std::cout << "Primerjamo:" << confidence << std::endl;
+				// std::cout << "Vzami confidence" << std::endl;	
+				// std::cout << "Primerjamo:" << confidence << std::endl;
 				if(confidence > best_conf){
 					best_conf = confidence;
 					std::cout << confidence << std::endl;
@@ -287,7 +287,7 @@ void NiceDetector::publish_rgb_blobs(list<Cluster>* clusters, const sensor_msgs:
 				delete patches;
 
 			}
-			std::cout << "END OF CLUSTERS-------------------" << std::endl;
+			// std::cout << "END OF CLUSTERS-------------------" << std::endl;
 			//std::cout << "OK - preverimo, ce smo nasli cloveka" << std::endl;
 			if (best_conf >= ADABOOST_THRESHOLD){
 				//std::cout << "ŠTEVCI OK: Imamo cloveka z ADABOOST: "<< best_conf << std::endl;		
@@ -311,11 +311,11 @@ void NiceDetector::publish_rgb_blobs(list<Cluster>* clusters, const sensor_msgs:
 				patch_height = best_trackedPatch.height;
 				have_new_patch = true;
 
-				std::cout << "1" << std::endl;
+				// std::cout << "1" << std::endl;
 				nice_detector::Rect trackingROI = largest->getTrackingROI(ADABOOST_SEARCH_AREA, validROI);
-				std::cout << "2" << std::endl;
+				// std::cout << "2" << std::endl;
 				Patches *trackingPatches = new PatchesRegularScan(trackingROI, validROI, best_trackedPatchSize, 0.99f);
-				std::cout << "3" << std::endl;
+				// std::cout << "3" << std::endl;
 				classifier->update (wholeImage, trackingPatches->getSpecialRect ("UpperLeft"), -1);
 				classifier->update (wholeImage, best_trackedPatch, 1);
 				classifier->update (wholeImage, trackingPatches->getSpecialRect ("UpperRight"), -1);
@@ -328,11 +328,11 @@ void NiceDetector::publish_rgb_blobs(list<Cluster>* clusters, const sensor_msgs:
 				//delete trackingPatches;
 				//frame_counter = 0;
 				//prediction_counter = 0;
-				std::cout << "4" << std::endl;
+				// std::cout << "4" << std::endl;
 				largest->CalculateCentroid();
 				largest->ShowBlobInWindow("1");
 			
-				std::cout << "5" << std::endl;
+				// std::cout << "5" << std::endl;
 				detectionMsg.detections.push_back(*(largest->Create_msg()));
 				detectionMsg.header = header;
 				detectionMsg.image = *image;
@@ -341,7 +341,7 @@ void NiceDetector::publish_rgb_blobs(list<Cluster>* clusters, const sensor_msgs:
 				//nice_detector::prediction::Response pred = getKalmanPrediction();
 				
 				//calculate_search_window(pred.prediction.x, pred.prediction.y, pred.prediction.z);
-				std::cout << "6" << std::endl;
+				// std::cout << "6" << std::endl;
 				pcl::getMinMax3D (*(largest->ReturnCluster()), min, max);
 				human_min_x = min[0];
 				human_max_x = max[0];
@@ -377,7 +377,7 @@ void NiceDetector::publish_rgb_blobs(list<Cluster>* clusters, const sensor_msgs:
 			human_min_y -= 0.15;
 			human_min_z -= 0.5;
 			human_max_z += 0.3;
-			std::cout << "Ni clustrov - razsirimo okno iskanja" << std::endl;
+			// std::cout << "Ni clustrov - razsirimo okno iskanja" << std::endl;
 			////std::cout << "Vzamemo predikcijo Kalmana. 0.:--------------------------------" << std::endl;
 			//nice_detector::prediction::Response pred = getKalmanPrediction();
 			//calculate_search_window(pred.prediction.x, pred.prediction.y, pred.prediction.z);
@@ -385,7 +385,7 @@ void NiceDetector::publish_rgb_blobs(list<Cluster>* clusters, const sensor_msgs:
 			//CALCULATE NEW SEARCH WINDOWS
 	
 		}		
-		std::cout << "-------------------------------------"<< std::endl;	
+		// std::cout << "-------------------------------------"<< std::endl;	
 	}
 }
 
@@ -505,7 +505,7 @@ void NiceDetector::cloud_preprocessing (const sensor_msgs::PointCloud2ConstPtr& 
    * not on whole point cloud.
    */
 	if (have_human){
-		 std::cout << "Imamo človeka!" << std::endl;
+		 // std::cout << "Imamo človeka!" << std::endl;
 		 pcl::getMinMax3D (*RansacInput, min_kinect_bound, max_kinect_bound);	
 		 //Filter X coordinates 
   	  	 pass.setInputCloud (RansacInput);
@@ -588,7 +588,7 @@ void NiceDetector::cloud_preprocessing (const sensor_msgs::PointCloud2ConstPtr& 
 		seg.setInputCloud (cloud_filtered_a);
 
 		if(cloud_filtered_a->points.size() > 60){
-			std::cout << "Dovolj tock"<< std::endl;	
+			// std::cout << "Dovolj tock"<< std::endl;	
 			seg.segment (*inliers, *coefficients);
 	
 			/*Remove the plane from bottom PC*/ 	
@@ -618,7 +618,7 @@ void NiceDetector::cloud_preprocessing (const sensor_msgs::PointCloud2ConstPtr& 
 		}
   
 	if(data){  		
-		std::cout << "data" << std::endl;
+		// std::cout << "data" << std::endl;
 		/* Creating the KdTree from input point cloud*/
 		pcl::search::KdTree<PointType>::Ptr tree (new pcl::search::KdTree<PointType>);
 		tree->setInputCloud (input_cloud);
@@ -640,7 +640,7 @@ void NiceDetector::cloud_preprocessing (const sensor_msgs::PointCloud2ConstPtr& 
 		}
 		catch (exception& e){
 			//have_human = false;
-			std::cout << "ujel" << std::endl;
+			// std::cout << "ujel" << std::endl;
 			data = false;
 		}
 		/* To separate each cluster out of the vector<PointIndices> we have to 
@@ -652,7 +652,7 @@ void NiceDetector::cloud_preprocessing (const sensor_msgs::PointCloud2ConstPtr& 
 		std::vector<int>::const_iterator pit;
 		float height;
 		clusters = new list<Cluster>;
-		std::cout << "Ok clustering" << std::endl;
+		// std::cout << "Ok clustering" << std::endl;
 		for(it = cluster_indices.begin(); it != cluster_indices.end(); ++it) {    	
 			float max_y = 1000.0f;
 			float max_z = -100.0f;
@@ -677,25 +677,25 @@ void NiceDetector::cloud_preprocessing (const sensor_msgs::PointCloud2ConstPtr& 
 			clustered_cloud->header.stamp = ros::Time::now(); 
 			publish_clusters.publish(*clustered_cloud);*/
 
-			std::cout << "naredimo cluster" << std::endl;
+			// std::cout << "naredimo cluster" << std::endl;
 			if(!have_human && data){
-					std::cout << "visina1" << std::endl;
+					// std::cout << "visina1" << std::endl;
 					height = calculate_height(coefficients->values[0], coefficients->values[1], coefficients->values[2], coefficients->values[3], pt.x, pt.y, pt.z); 
 				/*Limit the height and width of a cluster according to human*/
 				if ((MIN_ALLOWED_CLUSTER_HEIGHT < height) && (height < MAX_ALLOWED_CLUSTER_HEIGHT) && (max_z < MAX_ALLOWED_CLUSTER_DEPTH) && (max_z > MIN_ALLOWED_CLUSTER_DEPTH)){
 					clusters->push_back(*new Cluster(height, cluster_i, max_z, max_y, input->header));
 					//publish_height(pt.x, pt.y, pt.z, boost::lexical_cast<std::string>(height), input_cloud->header.frame_id);
 				}  
-				std::cout << "Ok visina" << std::endl;
+				// std::cout << "Ok visina" << std::endl;
 			}
 		
 			else if (data){
-					std::cout << "visina2" << std::endl;
+					// std::cout << "visina2" << std::endl;
 				height = calculate_height(coefficients->values[0], coefficients->values[1], coefficients->values[2], coefficients->values[3], pt.x, pt.y, pt.z); 
-				std::cout << "Ok visina 2" << std::endl;
+				// std::cout << "Ok visina 2" << std::endl;
 				if ((MIN_ALLOWED_CLUSTER_HEIGHT - 0.5 < height) && (height < MAX_ALLOWED_CLUSTER_HEIGHT) && (max_z < MAX_ALLOWED_CLUSTER_DEPTH) && (max_z > MIN_ALLOWED_CLUSTER_DEPTH)){
 					clusters->push_back(*new Cluster(height, cluster_i, max_z, max_y, input->header));
-					std::cout << "Ok cluster push, visina: "<< height << std::endl;
+					// std::cout << "Ok cluster push, visina: "<< height << std::endl;
 				}
 			}
 		

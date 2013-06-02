@@ -59,7 +59,7 @@ nice_detector::Rect Cluster::getTrackingROI(float searchFactor, nice_detector::R
  * This blob is later used for HOG confidence evaluation.
  */
 void Cluster::produceRGBBlob(const sensor_msgs::CameraInfoConstPtr& camInfo, const sensor_msgs::ImageConstPtr& image){
-	std::cout << "Produce RGB blob" << std::endl;	
+	// std::cout << "Produce RGB blob" << std::endl;	
   image_geometry::PinholeCameraModel cam_model_;
   cam_model_.fromCameraInfo(camInfo);
   cv::Point2d *uv = new cv::Point2d();
@@ -78,7 +78,7 @@ void Cluster::produceRGBBlob(const sensor_msgs::CameraInfoConstPtr& camInfo, con
   // parameters of kinect camera. Assign that pixel white color. 
   // We will extract true color from original RGB image later
   // get minimum and maximum values to adjust the size of the image to blob size
-	std::cout << "Produce RGB blob 1" << std::endl;	
+	// std::cout << "Produce RGB blob 1" << std::endl;	
 	for (int i = 0; i < cloud_cluster->points.size(); i++) {
     cv::Point3d pt_cv(cloud_cluster->points[i].x, cloud_cluster->points[i].y, cloud_cluster->points[i].z);
     cam_model_.project3dToPixel(pt_cv, *uv);   
@@ -88,7 +88,7 @@ void Cluster::produceRGBBlob(const sensor_msgs::CameraInfoConstPtr& camInfo, con
     maxX = max(maxX, (int)uv->x);
     maxY = max(maxY, (int)uv->y);    
   }
-  std::cout << "Produce RGB blob 2" << std::endl;	
+  // std::cout << "Produce RGB blob 2" << std::endl;	
   //set roi to later crop image to get POI
 	
 	if(maxX > 640.0)
@@ -118,14 +118,14 @@ void Cluster::produceRGBBlob(const sensor_msgs::CameraInfoConstPtr& camInfo, con
                                        cv::Size( 2*dilation_size + 1, 2*dilation_size+1 ),
                                        Point( dilation_size, dilation_size ) );
 
-	std::cout << "Začetek dilate" << std::endl;
+	// std::cout << "Začetek dilate" << std::endl;
   dilate(*img, *dst2, element );
   element = getStructuringElement(MORPH_RECT,
                                        cv::Size( 2*erosion_size + 1, 2*erosion_size+1 ),
                                        Point( erosion_size, erosion_size ) );
 
   /// Apply the erosion operation
-	std::cout << "Začetek erode" << std::endl;
+	// std::cout << "Začetek erode" << std::endl;
   erode(*dst2, *dst, element );	
 	//std::cout << "OK erode" << std::endl;
 	//Copy original ROS rgb image to CV image for further processing

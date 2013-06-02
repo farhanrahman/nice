@@ -1,6 +1,6 @@
 rate: 10
 
-world_objects: ["base_laser_link", "openni_depth_frame"] #["base_laser_link", "base_link", "base_footprint"]
+world_objects: ["base_laser_link", "camera_link"] #["base_laser_link", "base_link", "base_footprint"]
 
 base_footprint: { x: 0.0, y: 0.0, z: 0.0, rx: 0.0, ry: 0.0, rz: 0.0, rw: 1.0, parent_frame_id: "odom", frame_id: "base_footprint"}
 
@@ -8,4 +8,4 @@ base_link: { x: 0.0, y: 0.0, z: 0.1, rx: 0.0, ry: 0.0, rz: 0.0, rw: 1.0, parent_
 
 base_laser_link: { x: 0.2, y: 0.0, z: 0.1, rx: 0.0, ry: 0.0, rz: 0.0, rw: 1.0, parent_frame_id: "base_link", frame_id: "base_laser_link"}
 
-openni_depth_frame: { x: 0.2, y: 0.0, z: 0.20, rx: 0.0, ry: 0.0, rz: 0.0, rw: 1.0, parent_frame_id: "base_link", frame_id: "openni_depth_frame"}
+camera_link: { x: 0.2, y: 0.0, z: 0.20, rx: 0.0, ry: 0.0, rz: 0.0, rw: 1.0, parent_frame_id: "base_link", frame_id: "camera_link"}
