@@ -51,7 +51,7 @@ private:
 	void doneCallback(const actionlib::SimpleClientGoalState& state, const move_base_msgs::MoveBaseResultConstPtr& result);
 	boost::function<void (const actionlib::SimpleClientGoalState&, const move_base_msgs::MoveBaseResultConstPtr&) > f;
 	void feedbackCallback(const move_base_msgs::MoveBaseFeedbackConstPtr& feedback);
-	boost::function<void (const move_base_msgs::MoveBaseFeedbackConstPtr& feedback) > f2;
+	boost::function<void (const move_base_msgs::MoveBaseFeedbackConstPtr& ) > f2;
 
 	void updateBasePosition(const geometry_msgs::PoseStamped& base_position){
 		boost::mutex::scoped_lock(baseUpdateMutex);

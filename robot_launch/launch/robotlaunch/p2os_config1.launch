@@ -72,8 +72,13 @@
 <node pkg="nodelet" type="nodelet" name="NiceTracker" args="load nice_tracker/NiceTracker standalone_nodelet" output="screen" />
 	<!-- Run core module -->
 	<node pkg="nice_core" type="nice_core" name="nice_core">
-		<param name="follow_threshold" type="double" value="2.0"/>
+		<param name="follow_threshold" type="double" value="0.4"/>
 	</node>
+
+<include file="$(find ros_intro)/launch/joystick_controller.launch"/>
+
+	<!-- Run Map Server -->
+<!-- 	<node pkg="map_server" type="map_server" name="map_server" args="$(find robot_launch)/world/room509.yaml"/> -->
 
 	<!--Launch rviz-->
 	<node pkg="rviz" type="rviz" name="rviz" args="-d $(find robot_launch)/rviz/navigation.vcg">

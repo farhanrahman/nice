@@ -71,8 +71,8 @@ void NiceCore::doneCallback(const actionlib::SimpleClientGoalState& state, const
 		CoreMode cmCopy = this->getCoreMode();
 		if(cmCopy == FOLLOWING){
 			this->setCoreMode(PLANNING);
-			ROS_INFO("Sending main goal after resuing PLANNING");
-			ac->sendGoal(this->getMainGoal(), f);
+			ROS_INFO("Sending main goal after resuming PLANNING");
+			ac->sendGoal(this->getMainGoal(), f, MoveBaseClient::SimpleActiveCallback(), f2);
 		} else {
 			ROS_INFO("DONE");
 			this->setCoreMode(IDLE);
@@ -90,7 +90,7 @@ void NiceCore::mainGoalListenerCallback(const geometry_msgs::PoseStamped::ConstP
 
 	ROS_INFO("Sending main goal");
 
-	ac->sendGoal(this->getMainGoal(), f);
+	ac->sendGoal(this->getMainGoal(), f, MoveBaseClient::SimpleActiveCallback(), f2);
 }
 
 void NiceCore::kalmanCallback(const move_base_msgs::MoveBaseGoal::ConstPtr& msg){
@@ -155,7 +155,7 @@ void NiceCore::nodeLoop(void){
 				if(personFound){
 					this->setCoreMode(FOLLOWING);
 					ROS_INFO("Sending human sub goal");
-					ac->sendGoal(personToFollow, f);
+					ac->sendGoal(personToFollow, f, MoveBaseClient::SimpleActiveCallback(), f2);
 				}
 			}
 		}
