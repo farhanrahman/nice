@@ -1,3 +1,6 @@
 <launch>
-	<node pkg="nice_core" type="nice_core" name="nice_core"/>
+	<master auto="start"/>
+	<node pkg="nice_core" type="nice_core" name="nice_core">
+		<param name="follow_threshold" type="double" value="2.0"/>
+	</node>
 </launch>

@@ -1,4 +1,5 @@
 #include <nice_core/NiceCore.hpp>
+#include <iostream>
 
 namespace nice_core
 {
@@ -17,6 +18,12 @@ NiceCore::NiceCore(
 						&NiceCore::mainGoalListenerCallback,
 						this
 				);
+
+	n.param("nice_core/follow_threshold", followThreshold, 1.5);
+
+	ROS_INFO("followThreshold: %f", followThreshold );
+
+	followThresholdSq = followThreshold*followThreshold;
 
 	coreMode = IDLE;
 
@@ -96,7 +103,6 @@ void NiceCore::nodeLoop(void){
 	ros::Rate r(this->rate);
 
 	while(ros::ok()){
-
 		CoreMode cmCopy = this->getCoreMode();
 		if(cmCopy != IDLE){
 			std::queue<move_base_msgs::MoveBaseGoal> qCopy;
@@ -123,17 +129,25 @@ void NiceCore::nodeLoop(void){
 				bool personFound = false;
 				move_base_msgs::MoveBaseGoal personToFollow;
 
-				for(unsigned i = 0; i < qCopy.size(); ++i){
-					double personDistanceSqToGoal = 0.0;
-					move_base_msgs::MoveBaseGoal person = qCopy.front();
-					qCopy.pop();
-					double pdx = goalCopy.target_pose.pose.position.x - person.target_pose.pose.position.x;
-					double pdy = goalCopy.target_pose.pose.position.y - person.target_pose.pose.position.y;
-					personDistanceSqToGoal = pdx*pdx + pdy*pdy;
-					if(personDistanceSqToGoal < distanceSqToGoal){
-						if(personDistanceSqToGoal < minDistanceSq){
-							personFound = true;
-							personToFollow = person;
+				if(distanceSqToGoal < followThresholdSq){
+					ROS_INFO("Goal too close to follow a person");
+					for(unsigned i = 0; i < qCopy.size(); ++i){
+						qCopy.pop();
+					}
+				} else {
+
+					for(unsigned i = 0; i < qCopy.size(); ++i){
+						double personDistanceSqToGoal = 0.0;
+						move_base_msgs::MoveBaseGoal person = qCopy.front();
+						qCopy.pop();
+						double pdx = goalCopy.target_pose.pose.position.x - person.target_pose.pose.position.x;
+						double pdy = goalCopy.target_pose.pose.position.y - person.target_pose.pose.position.y;
+						personDistanceSqToGoal = pdx*pdx + pdy*pdy;
+						if(personDistanceSqToGoal < distanceSqToGoal){
+							if(personDistanceSqToGoal < minDistanceSq){
+								personFound = true;
+								personToFollow = person;
+							}
 						}
 					}
 				}

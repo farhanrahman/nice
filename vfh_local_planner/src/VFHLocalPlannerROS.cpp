@@ -7,6 +7,7 @@
 #include <utility>
 #include <algorithm>
 #include <vector>
+#include <limits.h>
 
 #define PI 3.14159265359
 
@@ -66,10 +67,10 @@ VFHLocalPlannerROS::VFHLocalPlannerROS(void) :
 	}
 
 	/*Initialise smax to 18 for now*/
-	smax = 18;
+	smax = 5;
 
 	/*Default value of 32 assigned to threshold (one eights of MAX_COST)*/
-	threshold = 32;
+	threshold = 0.0;//128.0*128.0;//256.0*256.0*10.0/8.0;
 
 }
 
@@ -100,6 +101,26 @@ void VFHLocalPlannerROS::initialisePOD(void){
 	}
 }
 
+double VFHLocalPlannerROS::getRotation(const tf::Stamped<tf::Pose>& point){
+
+    double x = point.getRotation().getX();
+    double y = point.getRotation().getY();
+    double z = point.getRotation().getZ();
+
+    double angle = 0;
+
+    double w = point.getRotation().getW();
+
+	double scale = sqrt(x * x + y * y + z * z);
+	x = x / scale;
+	y = y / scale;
+	z = z / scale;
+	angle = acos(w) * 2.0f;    
+
+	return angle*180.0/PI;
+	// ROS_INFO("angle: %f",angle*180.0/PI);
+}
+
 bool VFHLocalPlannerROS::computeVelocityCommands(geometry_msgs::Twist& cmd_vel){
 	if (!initialised){
 		ROS_WARN("VFHLocalPlannerROS not initialised");
@@ -121,6 +142,9 @@ bool VFHLocalPlannerROS::computeVelocityCommands(geometry_msgs::Twist& cmd_vel){
       return false;
     }
 
+     //we also want to clear the robot footprint from the costmap we're using
+    costmap_ros->clearRobotFootprint();   
+
     /*Extract the target position from the global goal point*/
     tf::Stamped<tf::Pose> goal_point;
     tf::poseStampedMsgToTF(transformed_plan.back(), goal_point);
@@ -130,32 +154,17 @@ bool VFHLocalPlannerROS::computeVelocityCommands(geometry_msgs::Twist& cmd_vel){
 
     double yaw = tf::getYaw(goal_point.getRotation());
 
-    double goal_th = yaw;
-
     double robot_target_angle = atan2(
     							goal_y - globalPose.getOrigin().getY(),
     							goal_x - globalPose.getOrigin().getX()
-    							);
-
-    //ROS_INFO("robot_target_angle: %f", 90.0+robot_target_angle*180.0/(PI));
-
+    							) * 180.0/PI;
+    robot_target_angle += 90.0;
 
 	/*Get a copy of the active window around the robot*/
-	//(*this).costmap_ros->getCostmapWindowCopy(windowSize, windowSize, this->costmap);
 	(*this).costmap_ros->getCostmapCopy(costmap);
 
 	/*Initialise the polar obstacle density array*/
 	this->initialisePOD();
-
-	// ROS_INFO("size in cells x: %d, size in cells y: %d, globalX: %d, globalY: %d", 
-	// 	costmap.getSizeInCellsX(), costmap.getSizeInCellsY(), globalPose.getOrigin().getY(), globalPose.getOrigin().getX() );
-
-
-	// for(unsigned i = 0; i < costmap.getSizeInCellsX(); ++i)
-	// 	for(unsigned j = 0; j < costmap.getSizeInCellsY(); ++j)
-	// {
-	// 	ROS_INFO("cost: %d", costmap.getCost(i,j));
-	// }
 
 	double cij = 0;
 	double dij = 0;
@@ -176,7 +185,21 @@ bool VFHLocalPlannerROS::computeVelocityCommands(geometry_msgs::Twist& cmd_vel){
 
 			/*Get the cost of cell, taking into account whether
 			 *the xi and yi values are greater than 0.0*/
-			cij = xi >= 0.0 && yj >= 0.0 ? costmap.getCost(xi,yj) : MAX_COST;
+			double wx = xi;
+			double wy = yj;
+
+			unsigned int mx = 0;
+			unsigned int my = 0;
+
+			bool success = costmap.worldToMap(wx,wy,mx,my);
+
+			//if(success){
+				cij = costmap.getCost(mx,my);//xi >= 0.0 && yj >= 0.0 ? costmap.getCost(xi,yj) : std::numeric_limits<double>::max();
+			//}
+			//else {
+			//	ROS_INFO("Reached unsuccessful for wx: %f, wy: %f, mx: %u, my: %u", wx, wy, mx, my);
+			//	cij = MAX_COST;
+			//}
 			/*compute the beta or direction values*/
 			
 			double betaAngle = atan2( 
@@ -198,10 +221,10 @@ bool VFHLocalPlannerROS::computeVelocityCommands(geometry_msgs::Twist& cmd_vel){
 			h[k] += m[i][j];
 	}
 
-	// unsigned limit = (unsigned) (360.0/(alpha*1.0));
-	// for(unsigned k = 0; k < limit; ++k){
-	// 	ROS_INFO("h[%d]: %f", k, h[k]);
-	// }	
+	unsigned limit = (unsigned) (360.0/(alpha*1.0));
+	for(unsigned k = 0; k < limit; ++k){
+		ROS_INFO("h[%d]: %f", k, h[k]);
+	}	
 
 	/*Find the candidate valleys*/
 	unsigned sectorSize = (unsigned) (360.0/(alpha*1.0));
@@ -254,8 +277,13 @@ bool VFHLocalPlannerROS::computeVelocityCommands(geometry_msgs::Twist& cmd_vel){
 		}
 	}
 
+	/*Initialise the command_vel for now to 0*/
+	cmd_vel.linear.x = 0.0;
+	cmd_vel.linear.y = 0.0;
+
 	/*Check if any valid paths can be found
 	 *from the candidate valleys*/
+	// ROS_INFO("size: %d", wideValleys.size());
 	if(wideValleys.size() != 0){
 		unsigned ktemp = 0;
 		double kn = 0;
@@ -265,6 +293,7 @@ bool VFHLocalPlannerROS::computeVelocityCommands(geometry_msgs::Twist& cmd_vel){
 		double min = 360.0;
 		double direction = 0.0;
 
+
 		for(unsigned i = 0; i < wideValleys.size(); ++i){
 			ktemp = wideValleys[i].first;
 			deg = (ktemp*360.0)/(sectorSize*1.0);
@@ -272,17 +301,22 @@ bool VFHLocalPlannerROS::computeVelocityCommands(geometry_msgs::Twist& cmd_vel){
 				min = fabs(deg-robot_target_angle);
 				sector = i;
 			}
-			// ktemp = wideValleys[i].second;
-			// deg = (ktemp*360.0)/(sectorSize*1.0);
 		}
+
+		//ROS_INFO("min: %f, deg: %f, robot_target_angle: %f", min, deg, robot_target_angle);		
 
 		std::pair<unsigned,unsigned> targetSector = wideValleys[sector];
 		kn = (targetSector.first*360.0)/(sectorSize*1.0);
 		kf = (targetSector.second*360.0)/(sectorSize*1.0);
 
+		// ROS_INFO("kn: %f, targetSector.first: %d, kf: %f, targetSector.second: %d", kn, targetSector.first , kf, targetSector.second);
+
 		direction = (kn+kf)/2.0;
-		//cmd_vel.angular.z = direction;
-		ROS_INFO("dir:%f", direction);
+		double angle = this->getRotation(globalPose);
+
+		cmd_vel.angular.z = direction - angle;
+		cmd_vel.linear.x = 0.5;
+		// ROS_INFO("angle: %f, dir:%f, ang.z: %f, robot_target_angle: %f", angle, direction, cmd_vel.angular.z, robot_target_angle);
 		return true;
 
 	} else if (narrowValleys.size() != 0){

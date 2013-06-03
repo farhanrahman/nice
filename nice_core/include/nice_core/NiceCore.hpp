@@ -91,6 +91,8 @@ private:
 		return ret;
 	}
 
+	double followThreshold;
+	double followThresholdSq;
 };
 }
 

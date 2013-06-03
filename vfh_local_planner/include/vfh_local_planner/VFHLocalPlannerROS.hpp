@@ -68,6 +68,8 @@ private:
 
 	void initialiseActiveWindow(void);	 
 
+	double getRotation(const tf::Stamped<tf::Pose>& point);
+
 	bool initialised;
 	costmap_2d::Costmap2DROS *costmap_ros;
 	costmap_2d::Costmap2D costmap;

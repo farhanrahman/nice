@@ -71,7 +71,9 @@
 
 <node pkg="nodelet" type="nodelet" name="NiceTracker" args="load nice_tracker/NiceTracker standalone_nodelet" output="screen" />
 	<!-- Run core module -->
-	<node pkg="nice_core" type="nice_core" name="nice_core"/>
+	<node pkg="nice_core" type="nice_core" name="nice_core">
+		<param name="follow_threshold" type="double" value="2.0"/>
+	</node>
 
 	<!--Launch rviz-->
 	<node pkg="rviz" type="rviz" name="rviz" args="-d $(find robot_launch)/rviz/navigation.vcg">
