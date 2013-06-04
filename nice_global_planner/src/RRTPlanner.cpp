@@ -1,6 +1,7 @@
 #include <nice_global_planner/RRTPlanner.hpp>
 #include <math.h>
 #include <utils/Vector.hpp>
+#include <boost/timer.hpp>
 
 namespace nice_global_planner{
 
@@ -10,11 +11,13 @@ RRTPlanner::RRTPlanner(
 	utils::IStamper *stamper,
 	Sampler *sampler,
 	double goalTolerance,
-	double maxDistance
+	double maxDistance,
+	double planningTime
 	) : start(start),
 		goal(goal),
 		stamper(stamper),
-		sampler(sampler)
+		sampler(sampler),
+		planningTime(planningTime)
 {
 	this->kdtree = new KDTree<double>(2);
 	this->goalTolerance = goalTolerance;
@@ -161,13 +164,19 @@ bool RRTPlanner::makePlan(
 	{
 		boost::mutex::scoped_lock(kdTreeLock);
 		kdtree->insert(sdata);
-	 	while(!goalReached(extended,gdata)){
+
+		boost::timer t;
+	 	while( !goalReached(extended,gdata) ){
 		 	target = this->choosePoint(this->goal, this->start);
 		 	pointToKDNodeVector2D(target,targetData);
 		 	nearestNode = kdtree->nearestNeighbour(targetData);
 		 	extended = this->extend(nearestNode->data, targetData);
 		 	if(point2DInFreeConfig(extended,gdata)){
 		 		(*this).kdtree->insert(extended);
+		 	}
+
+		 	if(t.elapsed() > planningTime){
+		 		return false;
 		 	}
 	 	}
 
@@ -186,7 +195,7 @@ bool RRTPlanner::makePlan(
 	 	plan.push_back(pStamped);
 	}
 
- 	return plan.size() != 0;
+ 	return true;
 }
 
 

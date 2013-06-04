@@ -93,6 +93,8 @@ private:
 
     std::vector<geometry_msgs::Point> footprint_spec_; ///< @brief The footprint specification of the robot
 
+    boost::mutex planningLock;
+
 };
 
 }

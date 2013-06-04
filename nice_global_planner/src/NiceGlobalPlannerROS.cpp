@@ -153,14 +153,20 @@ bool NiceGlobalPlannerROS::makePlan(const geometry_msgs::PoseStamped& start,
     new_goal.pose.orientation.w = goal_quat.w();
 
 	std::vector<geometry_msgs::PoseStamped> rrtPlan;
-
-	(*this).planner->updateGoal(new_goal.pose);
-	(*this).planner->updateStart(start.pose);
-	(*this).planner->refresh();
-	(*this).planner->makePlan(start.pose, goal.pose, rrtPlan);
-
+	bool madePlan = false;
+	{
+		boost::mutex::scoped_lock(planningLock);
+		(*this).planner->updateGoal(new_goal.pose);
+		(*this).planner->updateStart(start.pose);
+		(*this).planner->refresh();
+		madePlan = (*this).planner->makePlan(start.pose, goal.pose, rrtPlan);
+	}
 	// std::reverse(plan.begin(), plan.end());
-	this->smoothPath(rrtPlan, start, goal, plan);
+	
+	if(madePlan){
+		this->smoothPath(rrtPlan, start, goal, plan);
+		plan.push_back(new_goal);
+	}
 
 	for(unsigned i = 0; i < plan.size(); ++i){
 		std::cout << plan[i].pose.position.x << "," 
@@ -168,7 +174,7 @@ bool NiceGlobalPlannerROS::makePlan(const geometry_msgs::PoseStamped& start,
 		std::endl;
 	}
 
-	return true;
+	return madePlan;
 
 }
 

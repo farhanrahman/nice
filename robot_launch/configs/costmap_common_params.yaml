@@ -1,7 +1,7 @@
 map_type: costmap
 
-obstacle_range: 4.0
-raytrace_range: 3.0
+obstacle_range: 3.5
+raytrace_range: 4.0
 
 #footprint: [[-0.325, -0.325], [-0.325, 0.325], [0.325, 0.325], [0.46, 0.0], [0.325, -0.325]]
 
@@ -9,7 +9,7 @@ footprint: [[0.305, 0.278], [0.04, 0.193], [-0.04, 0.193], [-0.282, 0.178], [-0.
 #robot_radius: 0.4
 
 #Cost function parameters
-inflation_radius: 0.1
+inflation_radius: 0.55
 cost_scaling_factor: 10.0
 
 #Set the observation sources i.e. the sensors from which the readings will be taken

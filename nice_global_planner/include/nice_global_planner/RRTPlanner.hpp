@@ -29,7 +29,8 @@ public:
 		utils::IStamper *stamper,
 		Sampler *sampler,
 		double goalTolerance = 0.001,
-		double maxDistance = 0.5
+		double maxDistance = 0.5,
+		double planningTime = 2.0
 	);
 
 	~RRTPlanner(void);
@@ -104,6 +105,7 @@ private:
 
 	double maxDistance_;
 	double maxDistanceSq_;
+	double planningTime;
 
 };
 }
