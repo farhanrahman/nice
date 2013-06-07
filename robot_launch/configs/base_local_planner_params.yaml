@@ -20,3 +20,6 @@ TrajectoryPlannerROS:
   holonomic_robot: true
   # path_distance_bias: 0.75
   path_distance_bias: 0.4
+
+  yaw_goal_tolerance: 0.9
+  xy_goal_tolerance: 0.9

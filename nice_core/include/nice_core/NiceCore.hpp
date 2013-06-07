@@ -71,6 +71,12 @@ private:
 	move_base_msgs::MoveBaseGoal mainGoal;
 	ros::Subscriber mainGoalListener;
 
+	boost::mutex subGoalMutex;
+	move_base_msgs::MoveBaseGoal subGoal;
+
+	void setSubGoal(const geometry_msgs::PoseStamped& poseStamped);
+	move_base_msgs::MoveBaseGoal getSubGoal(void);
+
 	ros::Subscriber kalmanListener;
 	void kalmanCallback(const move_base_msgs::MoveBaseGoal::ConstPtr& msg);
 	boost::mutex kalmanMutex;
@@ -93,6 +99,13 @@ private:
 
 	double followThreshold;
 	double followThresholdSq;
+
+	double followGoalDiscard;
+	double followGoalDiscardSq;
+
+	double deltaDistanceSq;
+
+	double deltaDistanceInitTime;
 };
 }
 

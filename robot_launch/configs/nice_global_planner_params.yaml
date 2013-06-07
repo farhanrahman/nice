@@ -2,3 +2,4 @@ NiceGlobalPlannerROS:
    goal_tolerance: 0.001
    max_distance: 0.5
    cost_threshold: 20.0
+   planning_time: 20.0

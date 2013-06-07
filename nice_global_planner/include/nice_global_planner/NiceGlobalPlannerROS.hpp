@@ -95,6 +95,8 @@ private:
 
     boost::mutex planningLock;
 
+    double planningTime;
+
 };
 
 }

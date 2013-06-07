@@ -198,6 +198,8 @@ void NiceGlobalPlannerROS::initialize(std::string name, costmap_2d::Costmap2DROS
 
 	nh.param("cost_threshold", threshold, 100.0);
 
+	nh.param("planning_time", planningTime, 2.0);
+
 	geometry_msgs::Pose start;
 	geometry_msgs::Pose goal;
 
@@ -212,7 +214,7 @@ void NiceGlobalPlannerROS::initialize(std::string name, costmap_2d::Costmap2DROS
 
 	this->stamper = new utils::RosStamper();
 
-	this->planner = new RRTPlanner(start, goal, stamper, sampler, goalTolerance, maxDistance);
+	this->planner = new RRTPlanner(start, goal, stamper, sampler, goalTolerance, maxDistance, planningTime);
 
 	costmap_ros->getCostmapCopy(costmap);
 	world_model_ = new base_local_planner::CostmapModel(costmap); 
